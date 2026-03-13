@@ -383,7 +383,7 @@ select.filter-select {
 #detailPrevBtn:hover, #detailNextBtn:hover { border-color:var(--accent); color:var(--accent); }
 #detailPrevBtn:disabled, #detailNextBtn:disabled { opacity:.3; cursor:default; }
 .detail-hero {
-  display:grid; grid-template-columns: 1fr 380px; gap:24px;
+  display:grid; grid-template-columns: minmax(0,1fr) minmax(280px,380px); gap:24px;
   margin-bottom:24px;
 }
 @media (max-width:900px) { .detail-hero { grid-template-columns: 1fr; } .form-grid { grid-template-columns:1fr; } }
@@ -669,6 +669,7 @@ select.filter-select {
 
   <!-- ── DETAIL SCREEN ── -->
   <div class="screen" id="screen-detail-screen">
+  <div style="max-width:1100px; margin:0 auto">
     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; gap:12px">
       <div class="detail-back" onclick="switchScreen('inventory', document.querySelector('[data-screen=inventory]'))">← BACK TO INVENTORY</div>
       <div style="display:flex; align-items:center; gap:8px">
@@ -685,6 +686,7 @@ select.filter-select {
       </div>
     </div>
     <div id="detailContent"></div>
+  </div>
   </div>
 
   <!-- ── IMPORT/EXPORT SCREEN ── -->
