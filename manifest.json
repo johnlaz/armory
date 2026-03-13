@@ -2,7 +2,7 @@
   "name": "ARMORY Firearms Inventory",
   "short_name": "ARMORY",
   "description": "Tactical firearms inventory management system",
-  "start_url": "./index.html"
+  "start_url": "./index.html",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#0a0b0d",
