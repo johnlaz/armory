@@ -88,6 +88,20 @@ header {
   padding: 3px 10px;
   border-radius: 2px;
 }
+.stat-badge {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.stat-badge span { color: var(--accent); }
+.stat-badge.clickable { cursor: pointer; transition: border-color .2s, color .2s; }
+.stat-badge.clickable:hover { border-color: var(--accent); color: var(--text-primary); }
+.stat-badge.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
 
 /* ── BUTTONS ── */
 .btn {
@@ -631,6 +645,8 @@ select.filter-select {
   </div>
   <div class="header-actions">
     <span class="count-badge" id="headerCount">0 FIREARMS</span>
+    <span class="stat-badge" id="headerVault" title="Total MSRP / estimated value of all firearms">VAULT <span id="vaultValue">$0</span></span>
+    <span class="stat-badge clickable" id="headerRounds" title="Total rounds fired across all firearms — click to filter" onclick="toggleRoundsFilter()">ROUNDS <span id="roundsTotal">0</span></span>
     <button class="btn btn-icon" onclick="openSettings()" title="Settings">⚙</button>
     <button class="btn btn-icon" onclick="openCamera()" title="Scan with Camera">📷</button>
     <button class="btn btn-primary" onclick="openAddModal()">+ ADD FIREARM</button>
@@ -658,6 +674,17 @@ select.filter-select {
       </select>
       <select class="filter-select" id="caliberFilter" onchange="renderInventory()">
         <option value="">ALL CALIBERS</option>
+      </select>
+      <select class="filter-select" id="sortSelect" onchange="renderInventory()">
+        <option value="default">SORT: DEFAULT</option>
+        <option value="name-az">NAME A→Z</option>
+        <option value="name-za">NAME Z→A</option>
+        <option value="make-az">MAKE A→Z</option>
+        <option value="value-hi">VALUE: HIGH→LOW</option>
+        <option value="value-lo">VALUE: LOW→HIGH</option>
+        <option value="year-new">YEAR: NEWEST</option>
+        <option value="year-old">YEAR: OLDEST</option>
+        <option value="rounds-hi">ROUNDS: MOST</option>
       </select>
       <div class="view-toggle">
         <button class="view-btn active" id="vbtn-grid" onclick="setView('grid')" title="Card View">⊞</button>
@@ -806,7 +833,7 @@ select.filter-select {
             <option>EXCELLENT</option><option>VERY GOOD</option><option>GOOD</option><option>FAIR</option><option>POOR</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">VALUE ($)</label><input class="form-input" id="f-value" placeholder="e.g. 650" type="number"></div>
+        <div class="form-group"><label class="form-label">MSRP / EST. VALUE ($)</label><input class="form-input" id="f-value" placeholder="e.g. 650" type="number"></div>
         <div class="form-group full"><label class="form-label">NOTES</label><textarea class="form-textarea" id="f-notes" placeholder="Modifications, purchase info, storage location..."></textarea></div>
         <div class="form-group full">
           <label class="form-label">PHOTO — UPLOAD FILE OR PASTE URL</label>
@@ -952,6 +979,7 @@ function rmaAdjustRounds(id, delta) {
   const el = document.getElementById('rmaTotal_' + id);
   if (el) el.textContent = g.range_rounds.total.toLocaleString();
   save();
+  updateStats();
 }
 
 function rmaLogSession(id) {
@@ -976,6 +1004,7 @@ function rmaLogSession(id) {
     logEl.innerHTML = recent.map(s => `<div class="rma-log-entry">${s.date} — ${s.rounds.toLocaleString()} rounds</div>`).join('');
   }
   save();
+  updateStats();
   showToast(`✓ Logged ${rounds.toLocaleString()} rounds`, 'success');
 }
 
@@ -1195,7 +1224,7 @@ function detailHeroImage(g) {
 
 function save() {
   localStorage.setItem('armory_inventory', JSON.stringify(inventory));
-  updateHeaderCount();
+  updateStats();
   updateCaliberFilter();
 }
 
@@ -1234,15 +1263,36 @@ function renderInventory() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   const typeF = document.getElementById('typeFilter').value;
   const calF = document.getElementById('caliberFilter').value;
-  const items = inventory.filter(g => {
+  const sortV = document.getElementById('sortSelect').value;
+  const roundsOnly = document.getElementById('headerRounds').classList.contains('active');
+
+  let items = inventory.filter(g => {
     const text = [g.make,g.model,g.caliber,g.serial_number,g.type].join(' ').toLowerCase();
+    const rounds = (g.range_rounds && g.range_rounds.total) ? g.range_rounds.total : 0;
     return (!q || text.includes(q))
       && (!typeF || g.type === typeF)
-      && (!calF || g.caliber === calF);
+      && (!calF || g.caliber === calF)
+      && (!roundsOnly || rounds > 0);
+  });
+
+  // ── SORT ──
+  items = [...items].sort((a, b) => {
+    const aRounds = (a.range_rounds && a.range_rounds.total) || 0;
+    const bRounds = (b.range_rounds && b.range_rounds.total) || 0;
+    switch (sortV) {
+      case 'name-az': return (a.model||'').localeCompare(b.model||'');
+      case 'name-za': return (b.model||'').localeCompare(a.model||'');
+      case 'make-az': return (a.make||'').localeCompare(b.make||'');
+      case 'value-hi': return (Number(b.value)||0) - (Number(a.value)||0);
+      case 'value-lo': return (Number(a.value)||0) - (Number(b.value)||0);
+      case 'year-new': return (Number(b.year)||0) - (Number(a.year)||0);
+      case 'year-old': return (Number(a.year)||0) - (Number(b.year)||0);
+      case 'rounds-hi': return bRounds - aRounds;
+      default: return 0;
+    }
   });
 
   const grid = document.getElementById('inventoryGrid');
-  // Keep view class
   grid.className = 'inventory-grid' + (currentView !== 'grid' ? ' view-' + currentView : '');
 
   if (!items.length) {
@@ -1251,6 +1301,7 @@ function renderInventory() {
       <h3>${inventory.length ? 'NO RESULTS' : 'NO FIREARMS LOGGED'}</h3>
       <p>${inventory.length ? 'Try adjusting your filters' : 'Add a firearm manually or import from Excel'}</p>
     </div>`;
+    updateStats();
     return;
   }
 
@@ -1278,7 +1329,6 @@ function renderInventory() {
         <div class="list-arrow">›</div>
       </div>`).join('');
   } else {
-    // Grid (normal + small — same card markup, CSS handles size)
     grid.innerHTML = items.map(g => `
       <div class="gun-card" data-id="${g.id}" onclick="showDetail('${g.id}')">
         <div class="gun-card-img">
@@ -1298,10 +1348,24 @@ function renderInventory() {
         </div>
       </div>`).join('');
   }
+  updateStats();
 }
 
-function updateHeaderCount() {
+function updateStats() {
+  // count
   document.getElementById('headerCount').textContent = inventory.length + ' FIREARM' + (inventory.length !== 1 ? 'S' : '');
+  // vault value
+  const total = inventory.reduce((s, g) => s + (Number(g.value) || 0), 0);
+  document.getElementById('vaultValue').textContent = total > 0 ? '$' + total.toLocaleString() : '$0';
+  // total rounds
+  const rounds = inventory.reduce((s, g) => s + ((g.range_rounds && g.range_rounds.total) || 0), 0);
+  document.getElementById('roundsTotal').textContent = rounds.toLocaleString();
+}
+
+function toggleRoundsFilter() {
+  const badge = document.getElementById('headerRounds');
+  badge.classList.toggle('active');
+  renderInventory();
 }
 
 function updateCaliberFilter() {
@@ -2446,7 +2510,7 @@ function init() {
   // Restore saved view
   setView(currentView);
   renderInventory();
-  updateHeaderCount();
+  updateStats();
   updateCaliberFilter();
 
   // Nudge if no API key
