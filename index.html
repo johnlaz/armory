@@ -66,21 +66,25 @@ header {
   background: rgba(10,11,13,0.96);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px;
-  min-height: 60px;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 8px 16px;
+  gap: 6px;
+}
+.header-row1 {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.header-row2 {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .logo {
   font-family: var(--heading);
-  font-size: 28px;
+  font-size: 24px;
   letter-spacing: 4px;
   color: var(--accent);
   text-shadow: 0 0 20px rgba(200,168,75,0.4);
 }
-.logo span { color: var(--text-dim); font-size: 11px; font-family: var(--mono); display:block; letter-spacing:2px; margin-top:-4px; }
-.header-actions { display:flex; gap:10px; align-items:center; }
+.logo span { color: var(--text-dim); font-size: 10px; font-family: var(--mono); display:block; letter-spacing:2px; margin-top:-4px; }
+.header-actions { display:flex; gap:8px; align-items:center; flex-shrink:0; }
 .count-badge {
   font-family: var(--mono);
   font-size: 11px;
@@ -104,7 +108,6 @@ header {
 .stat-badge.clickable { cursor: pointer; transition: border-color .2s, color .2s; }
 .stat-badge.clickable:hover { border-color: var(--accent); color: var(--text-primary); }
 .stat-badge.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
-@media (max-width: 600px) { #headerVault, #headerRounds { display: none; } }
 
 /* ── BUTTONS ── */
 .btn {
@@ -641,18 +644,20 @@ select.filter-select {
 
 <!-- HEADER -->
 <header>
-  <div>
+  <div class="header-row1">
     <div class="logo">⬡ ARMORY
       <span>FIREARMS INVENTORY SYSTEM</span>
     </div>
+    <div class="header-actions">
+      <button class="btn btn-icon" onclick="openSettings()" title="Settings">⚙</button>
+      <button class="btn btn-icon" onclick="openCamera()" title="Scan with Camera">📷</button>
+      <button class="btn btn-primary" onclick="openAddModal()">+ ADD</button>
+    </div>
   </div>
-  <div class="header-actions">
+  <div class="header-row2">
     <span class="count-badge" id="headerCount">0 FIREARMS</span>
-    <span class="stat-badge" id="headerVault" title="Total MSRP / estimated value of all firearms">VAULT <span id="vaultValue">$0</span></span>
-    <span class="stat-badge clickable" id="headerRounds" title="Total rounds fired across all firearms — click to filter" onclick="toggleRoundsFilter()">ROUNDS <span id="roundsTotal">0</span></span>
-    <button class="btn btn-icon" onclick="openSettings()" title="Settings">⚙</button>
-    <button class="btn btn-icon" onclick="openCamera()" title="Scan with Camera">📷</button>
-    <button class="btn btn-primary" onclick="openAddModal()">+ ADD FIREARM</button>
+    <span class="stat-badge" id="headerVault" title="Total MSRP / estimated value of all firearms">💰 VAULT <span id="vaultValue">$0</span></span>
+    <span class="stat-badge clickable" id="headerRounds" title="Total rounds fired — click to filter" onclick="toggleRoundsFilter()">🎯 ROUNDS <span id="roundsTotal">0</span></span>
   </div>
 </header>
 
