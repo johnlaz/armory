@@ -1364,18 +1364,6 @@ function showDetail(id) {
           </label>
           <button class="detail-img-upload-btn" onclick="openLogoPicker('${g.id}')" title="Pick from manufacturer logos">🏷 USE MANUFACTURER LOGO</button>
         </div>
-        </div>
-        <br>
-        <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
-          <span>AI DESCRIPTION</span>
-          <button id="aiDescRefreshBtn" onclick="refreshAIDescription('${g.id}')" title="Force re-fetch AI description" style="background:none;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:2px;cursor:pointer;${g.ai_description ? 'display:none' : ''}">↺ REFRESH</button>
-        </div>
-        <div class="detail-description" id="aiDesc">
-          ${g.ai_description
-            ? g.ai_description.split('\n\n').map(p => p ? `<p style="margin-bottom:12px">${p}</p>` : '').join('')
-            : '<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div> <span>Fetching firearm data...</span></div>'
-          }
-        </div>
       </div>
       <div class="detail-info-panel">
         <div>
@@ -1408,6 +1396,18 @@ function showDetail(id) {
             <span id="detailAiStatusText">Researching specifications...</span>
           </span>
         </div>
+      </div>
+    </div>
+    <div style="margin-top:24px">
+      <div class="section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>AI DESCRIPTION</span>
+        <button id="aiDescRefreshBtn" onclick="refreshAIDescription('${g.id}')" title="Force re-fetch AI description" style="background:none;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:2px;cursor:pointer;${g.ai_description ? 'display:none' : ''}">↺ REFRESH</button>
+      </div>
+      <div class="detail-description" id="aiDesc">
+        ${g.ai_description
+          ? g.ai_description.split('\n\n').map(p => p ? `<p style="margin-bottom:12px">${p}</p>` : '').join('')
+          : '<div class="ai-loading"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div> <span>Fetching firearm data...</span></div>'
+        }
       </div>
     </div>`;
 
