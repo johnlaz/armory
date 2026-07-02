@@ -2493,12 +2493,12 @@ select.filter-select:focus { border-color: var(--accent); }
         <div class="settings-section">
           <div class="settings-section-title">AI TEXT MODEL</div>
           <select class="form-input" id="textModelSelect" style="font-family:var(--font);font-size:12px;margin-bottom:8px">
-            <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile — Best quality · auto-fallback on rate limit</option>
-            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant — Faster · higher daily limits</option>
-            <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 — Alternative quality model</option>
-            <option value="gemma2-9b-it">gemma2-9b-it — Lightweight · low token use</option>
+            <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b — Recommended · best quality</option>
+            <option value="openai/gpt-oss-120b">openai/gpt-oss-120b — Most capable · slower</option>
+            <option value="openai/gpt-oss-20b">openai/gpt-oss-20b — Fast · lower token use</option>
+            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant — Lightweight · high limits</option>
           </select>
-          <div class="settings-hint">Free tier: ~500K tokens/day · resets midnight UTC · auto-fallback enabled</div>
+          <div class="settings-hint">Free tier: ~500K tokens/day · resets midnight UTC · llama-3.3-70b-versatile deprecated June 2026</div>
         </div>
 
       </div>
@@ -2848,7 +2848,7 @@ function rmaSaveAccessories(id) {
 }
 
 function getTextModel() {
-  return localStorage.getItem('armory_text_model') || 'llama-3.3-70b-versatile';
+  return localStorage.getItem('armory_text_model') || 'qwen/qwen3.6-27b';
 }
 
 async function grokText(prompt) {
