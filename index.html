@@ -2867,19 +2867,24 @@ async function grokText(prompt) {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
       body: JSON.stringify({
         model,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant. Do not show your thinking or reasoning process. Respond directly with your answer only.' },
+          { role: 'user', content: '/no_think\n\n' + prompt }
+        ],
         max_tokens: 1000,
-        // Suppress Qwen3 chain-of-thought reasoning output
-        reasoning_effort: 'none',
+        // Disable Qwen3 chain-of-thought — 'none' not supported, omit the param entirely
+        // and instead instruct via system message (handled in prompt)
       })
     });
     const data = await resp.json();
     if (!data.error) {
       let text = data.choices?.[0]?.message?.content || '';
-      // Strip any leaked thinking blocks (Qwen3 edge cases)
+      // Strip <think>...</think> blocks
       text = text.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-      // Also strip "Thinking Process:" preamble paragraphs if present
-      text = text.replace(/^(Thinking Process:[\s\S]*?)(\n\n(?!\d+\.\s|\*\*))/i, '').trim();
+      // Strip "Thinking Process:" preamble — everything up to the first real paragraph
+      text = text.replace(/^thinking process:[\s\S]*?(?=\n{2,}[a-z])/gi, '').trim();
+      // Strip any remaining numbered reasoning steps at the start
+      text = text.replace(/^(\d+\.\s+\*\*[\s\S]*?)(?=\n{2,}(?!\d+\.\s))/i, '').trim();
       return text;
     }
 
@@ -3532,10 +3537,17 @@ function buildRmaSections(g) {
 async function fetchAIDescription(g) {
   const el = document.getElementById('aiDesc');
   if (!el) return;
-  // If already cached, just render it — never fetch again unless user explicitly refreshes
+  // If already cached, check it doesn't contain thinking output before rendering
   if (g.ai_description) {
-    el.innerHTML = g.ai_description.split('\n\n').map(p => p ? `<p style="margin-bottom:12px">${p}</p>` : '').join('');
-    return;
+    const hasThinking = /thinking process:|<think>/i.test(g.ai_description);
+    if (hasThinking) {
+      // Wipe bad cached description and re-fetch clean
+      g.ai_description = null;
+      save();
+    } else {
+      el.innerHTML = g.ai_description.split('\n\n').map(p => p ? `<p style="margin-bottom:12px">${p}</p>` : '').join('');
+      return;
+    }
   }
   if (!getApiKey()) {
     el.innerHTML = `<em style="color:var(--accent)">⚙ Add your Groq API key in Settings to enable AI descriptions.</em>`;
