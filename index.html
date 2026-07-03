@@ -3555,7 +3555,24 @@ async function fetchAIDescription(g) {
   }
   try {
     const prompt = `You are a passionate firearms historian and expert. Write an engaging, narrative description of the ${g.make} ${g.model}${g.caliber ? ' chambered in ' + g.caliber : ''}${g.year ? ', ' + g.year : ''}. Tell the story of this firearm — its origins, what makes it special, why collectors and shooters prize it, its place in history or popular culture, and what it's like to own and shoot one. ${g.serial_number && g.serial_number !== 'N/A' ? `Serial number ${g.serial_number} — note anything that can be inferred about production era or variant.` : ''} Write 3-4 flowing paragraphs in an enthusiastic but authoritative voice — the kind of description that makes a collector proud to have this piece in their vault. No bullet points, no headers, no numbered lists. Pure narrative prose.`;
-    const text = await grokText(prompt);
+
+    // Use llama-3.1-8b-instant directly — it's a pure generative model with no reasoning/thinking
+    // mode, which produces clean narrative prose. Qwen3 (the default model) is a reasoning model
+    // that bleeds its chain-of-thought into responses regardless of suppression attempts.
+    const key = getApiKey();
+    if (!key) throw new Error('No API key');
+    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 1000
+      })
+    });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error.message || 'API error');
+    const text = (data.choices?.[0]?.message?.content || '').trim();
     // Save and lock in — once set, never auto-fetch again
     g.ai_description = text;
     save();
