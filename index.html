@@ -1167,7 +1167,22 @@ select.filter-select:focus { border-color: var(--accent); }
   justify-content: center;
   overflow: hidden;
 }
-.detail-img-panel img { width: 100%; height: 100%; object-fit: cover; }
+.detail-img-panel img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+.detail-img-panel img:hover::after { content: '⤢'; }
+.detail-img-panel { position: relative; }
+.detail-img-panel .zoom-hint {
+  position: absolute;
+  bottom: 10px; right: 10px;
+  background: rgba(0,0,0,0.55);
+  border: 0.5px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+  backdrop-filter: blur(4px);
+}
 .detail-img-placeholder { font-size: 72px; opacity: .12; }
 
 .detail-img-upload-btn {
@@ -3185,8 +3200,8 @@ function renderInventory() {
 
   if (currentView === 'list') {
     grid.innerHTML = items.map(g => `
-      <div class="gun-card" data-id="${g.id}" onclick="showDetail('${g.id}')">
-        <div class="gun-card-img">
+      <div class="gun-card" data-id="${g.id}">
+        <div class="gun-card-img${g.image_url ? ' pv-trigger' : ''}" ${g.image_url ? `data-pv="${g.id}" style="cursor:zoom-in"` : ''}>
           ${cardImageHTML(g)}
           <span class="type-badge">${g.type||'FIREARM'}</span>
         </div>
@@ -3208,8 +3223,8 @@ function renderInventory() {
       </div>`).join('');
   } else {
     grid.innerHTML = items.map(g => `
-      <div class="gun-card" data-id="${g.id}" onclick="showDetail('${g.id}')">
-        <div class="gun-card-img">
+      <div class="gun-card" data-id="${g.id}">
+        <div class="gun-card-img${g.image_url ? ' pv-trigger' : ''}" ${g.image_url ? `data-pv="${g.id}" style="cursor:zoom-in"` : ''}>
           ${cardImageHTML(g)}
           <span class="type-badge">${g.type||'FIREARM'}</span>
         </div>
@@ -3295,9 +3310,13 @@ function showDetail(id) {
     <div class="detail-hero">
       <div>
         <div class="detail-img-wrap">
-          <div class="detail-img-panel" id="detailImgPanel">
+          <div class="detail-img-panel" id="detailImgPanel" ${g.image_url ? `data-pv="${g.id}" style="cursor:zoom-in"` : ''}>
             ${g.image_url
-              ? `<img src="${g.image_url}" onerror="this.parentElement.innerHTML='<div class=detail-img-placeholder>🔫</div>'">`
+              ? `<img src="${g.image_url}"
+                   style="cursor:zoom-in"
+                   title="Tap to view full image"
+                   onerror="this.parentElement.innerHTML='<div class=detail-img-placeholder>🔫</div>'">
+                 <div class="zoom-hint">⤢</div>`
               : detailHeroImage(g)
             }
           </div>
@@ -5404,8 +5423,72 @@ function exportVaultCard(ids, opts) {
 
 
 // ══════════════════════════════════════════
-//  PHOTO GALLERY
+//  PHOTO VIEWER
 // ══════════════════════════════════════════
+let _pvGunId = null; // currently viewed gun ID
+
+function openPhotoViewer(src, caption, gunId, fromVault) {
+  if (!src) return;
+  _pvGunId = gunId || null;
+  const overlay  = document.getElementById('photoViewerOverlay');
+  const detailBtn = document.getElementById('pvDetailBtn');
+  document.getElementById('pvImg').src = src;
+  document.getElementById('pvCaption').textContent = (caption || '').toUpperCase();
+  // Show "View Detail" only when tapped from vault, not when already in detail
+  if (detailBtn) detailBtn.style.display = (fromVault && gunId) ? 'block' : 'none';
+  overlay.style.pointerEvents = 'auto';
+  requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+  document.body.style.overflow = 'hidden';
+}
+
+function closePhotoViewer() {
+  const overlay = document.getElementById('photoViewerOverlay');
+  overlay.style.opacity = '0';
+  overlay.style.pointerEvents = 'none';
+  document.body.style.overflow = '';
+  setTimeout(() => { document.getElementById('pvImg').src = ''; }, 250);
+}
+
+function photoViewerGoDetail() {
+  if (!_pvGunId) return;
+  closePhotoViewer();
+  // Small delay so the viewer fades before detail animates in
+  setTimeout(() => showDetail(_pvGunId), 180);
+}
+
+// Delegated handler — handles both photo viewer tap and card navigation.
+// Must be a single listener so photo tap can prevent card navigation.
+document.addEventListener('click', e => {
+
+  // ── Photo tap: [data-pv] element or child of it ──
+  const pvTrigger = e.target.closest('[data-pv]');
+  if (pvTrigger) {
+    // Only intercept if we're on the inventory screen — detail panel has data-pv too
+    // but there we want the viewer without the detail button logic change
+    e.stopPropagation();
+    const id = pvTrigger.dataset.pv;
+    const g  = inventory.find(x => x.id === id);
+    if (!g || !g.image_url) return;
+    const currentScreen = document.querySelector('.screen.active')?.id;
+    const fromVault = currentScreen === 'screen-inventory';
+    openPhotoViewer(g.image_url, (g.make || '') + ' ' + (g.model || ''), id, fromVault);
+    return; // do NOT fall through to card navigation
+  }
+
+  // ── Card tap: [data-id] element or child of it (but not inside photo area) ──
+  const card = e.target.closest('[data-id]');
+  if (card && document.getElementById('screen-inventory')?.classList.contains('active')) {
+    showDetail(card.dataset.id);
+  }
+
+});
+
+// Close on Escape
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closePhotoViewer();
+});
+
+
 let _galleryData = []; // staging array while modal is open
 
 function handleGalleryUpload(event) {
@@ -6719,6 +6802,57 @@ document.addEventListener('DOMContentLoaded', function() {
     <div class="modal-footer" style="gap:8px">
       <button class="btn" onclick="closeModal('shareModal')">Cancel</button>
       <button class="btn btn-primary" onclick="generateSharePDF()">⬡ GENERATE &amp; EXPORT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PHOTO VIEWER MODAL
+     ═══════════════════════════════════════════════════════════ -->
+<div id="photoViewerOverlay" onclick="closePhotoViewer()" style="
+  position:fixed;inset:0;z-index:1800;
+  background:rgba(0,0,0,0.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:16px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.22s ease;
+">
+  <div style="position:relative;width:100%;max-width:760px;display:flex;flex-direction:column;align-items:center;gap:12px" onclick="event.stopPropagation()">
+    <!-- Header -->
+    <div style="width:100%;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-family:var(--font);font-size:10px;letter-spacing:2px;color:var(--accent)" id="pvCaption"></div>
+      <button onclick="closePhotoViewer()" style="
+        background:rgba(28,28,30,0.85);border:0.5px solid var(--separator);
+        color:var(--text-primary);font-size:17px;width:36px;height:36px;
+        border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
+        transition:background 0.15s;
+      ">✕</button>
+    </div>
+    <!-- Image -->
+    <div style="
+      width:100%;max-height:72vh;
+      display:flex;align-items:center;justify-content:center;
+      border-radius:12px;overflow:hidden;
+      border:0.5px solid rgba(84,84,88,0.4);
+      background:#0A0A0C;
+    ">
+      <img id="pvImg" src="" alt="" style="
+        max-width:100%;max-height:72vh;
+        object-fit:contain;display:block;
+      ">
+    </div>
+    <!-- Footer: hint + optional View Detail button -->
+    <div style="display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px">
+      <div style="font-family:var(--font);font-size:10px;color:rgba(235,235,245,0.3);letter-spacing:1px">TAP OUTSIDE TO CLOSE</div>
+      <button id="pvDetailBtn" onclick="photoViewerGoDetail()" style="
+        display:none;
+        background:var(--accent);border:none;color:#0A0A0C;
+        font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:1.5px;
+        padding:10px 18px;border-radius:var(--radius-sm);cursor:pointer;
+        white-space:nowrap;flex-shrink:0;
+        transition:opacity 0.15s;
+      ">⬡ VIEW DETAIL</button>
     </div>
   </div>
 </div>
