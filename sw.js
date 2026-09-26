@@ -1,5 +1,5 @@
-// ARMORY Service Worker — v3.0
-const CACHE_NAME = 'armory-v3.1';
+// ARMORY Service Worker — v3
+const CACHE_NAME = 'armory-v3.2';
 
 const PRECACHE_URLS = [
   './manifest.json',
