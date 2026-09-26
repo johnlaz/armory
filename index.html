@@ -1082,6 +1082,32 @@ select.filter-select:focus { border-color: var(--accent); }
   .modal-footer { padding: 12px 16px 16px; }
 }
 
+/* ── SCAN / CAMERA MODAL: always centered, never clipped ──
+   This modal is short and self-contained (header + video + two buttons),
+   so instead of the generic desktop top-anchor or mobile bottom-sheet
+   layout above — which could push its header above the visible area on
+   a short window, or drop it to the bottom of a tall screen leaving a
+   big empty gap above — it's simply centered in whatever viewport is
+   available, at every screen size. The #cameraModal ID selector outranks
+   the .modal-overlay / .modal rules (including inside the media query
+   above), so no !important is needed. */
+#cameraModal {
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+#cameraModal .modal {
+  max-height: calc(100dvh - 32px);
+  margin: 0;
+  border-radius: var(--radius-xl);
+}
+#cameraModal .modal-header {
+  padding-top: 16px;
+}
+#cameraModal .modal-header::before {
+  display: none;
+}
+
 /* ═══════════════════════════════════════════════════════════
    FORMS
    ═══════════════════════════════════════════════════════════ */
