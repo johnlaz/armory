@@ -2507,13 +2507,15 @@ select.filter-select:focus { border-color: var(--accent); }
 
         <div class="settings-section">
           <div class="settings-section-title">AI TEXT MODEL</div>
-          <select class="form-input" id="textModelSelect" style="font-family:var(--font);font-size:12px;margin-bottom:8px">
-            <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b — Recommended · best quality</option>
-            <option value="openai/gpt-oss-120b">openai/gpt-oss-120b — Most capable · slower</option>
-            <option value="openai/gpt-oss-20b">openai/gpt-oss-20b — Fast · lower token use</option>
-            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant — Lightweight · high limits</option>
-          </select>
-          <div class="settings-hint">Free tier: ~500K tokens/day · resets midnight UTC · llama-3.3-70b-versatile deprecated June 2026</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <select class="form-input" id="textModelSelect" style="font-family:var(--font);font-size:12px;flex:1">
+              <option value="openai/gpt-oss-120b">openai/gpt-oss-120b — Most capable · slower</option>
+              <option value="openai/gpt-oss-20b">openai/gpt-oss-20b — Fast · lower token use</option>
+              <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b — Legacy · being retired by Groq</option>
+            </select>
+            <button class="btn" onclick="refreshModelList(true)" id="refreshModelsBtn" style="flex-shrink:0;min-width:44px" title="Pull the current model list from Groq using this key">🔄</button>
+          </div>
+          <div class="settings-hint" id="modelListStatus">Enter your key above, then tap 🔄 to pull whatever models Groq currently serves on it — keeps this list from going stale whenever Groq retires a model.</div>
         </div>
 
       </div>
@@ -2862,18 +2864,80 @@ function rmaSaveAccessories(id) {
   save();
 }
 
+// ── Hot-swappable model list ──
+// Groq periodically retires models (see console.groq.com/docs/deprecations), so instead of
+// trusting a hardcoded id we pull whatever the account's key can actually see and cache it.
+// IDs that are clearly non-chat (audio, moderation/guard, tts) are filtered out of the
+// text dropdown; everything else Groq returns is assumed usable.
+function getCachedModelIds() {
+  try {
+    const raw = localStorage.getItem('armory_model_cache');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed.ids) ? parsed.ids : [];
+  } catch { return []; }
+}
+
+function isNonChatModelId(id) {
+  return /whisper|tts|guard|prompt-guard|moderation/i.test(id);
+}
+
+async function fetchGroqModelIds(key) {
+  const resp = await fetch('https://api.groq.com/openai/v1/models', {
+    headers: { 'Authorization': `Bearer ${key}` }
+  });
+  const data = await resp.json();
+  if (!resp.ok || data.error) throw new Error(data.error?.message || `HTTP ${resp.status}`);
+  const ids = (data.data || []).map(m => m.id).filter(id => !isNonChatModelId(id));
+  if (!ids.length) throw new Error('Groq returned no chat-capable models for this key.');
+  return ids;
+}
+
+async function refreshModelList(interactive) {
+  const statusEl = document.getElementById('modelListStatus');
+  const btn = document.getElementById('refreshModelsBtn');
+  const keyInput = document.getElementById('apiKeyInput');
+  const key = (keyInput && keyInput.value.trim()) || getApiKey();
+  if (!key) {
+    if (interactive) showToast('Enter your Groq key first', 'error');
+    return;
+  }
+  if (btn) btn.disabled = true;
+  if (statusEl) statusEl.textContent = 'Checking Groq for available models…';
+  try {
+    const ids = await fetchGroqModelIds(key);
+    localStorage.setItem('armory_model_cache', JSON.stringify({ ids, fetched: Date.now() }));
+    const sel = document.getElementById('textModelSelect');
+    if (sel) {
+      const prevValue = sel.value;
+      sel.innerHTML = ids.map(id => `<option value="${id}">${id}</option>`).join('');
+      sel.value = ids.includes(prevValue) ? prevValue : ids[0];
+    }
+    if (statusEl) statusEl.textContent = `✓ Loaded ${ids.length} model${ids.length===1?'':'s'} live from Groq just now.`;
+    if (interactive) showToast(`✓ Pulled ${ids.length} models from Groq`, 'success');
+  } catch (e) {
+    if (statusEl) statusEl.textContent = `⚠ Couldn't reach Groq (${e.message}). Showing the last known list.`;
+    if (interactive) showToast(`⚠ Model refresh failed: ${e.message}`, 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
 function getTextModel() {
-  return localStorage.getItem('armory_text_model') || 'qwen/qwen3.6-27b';
+  return localStorage.getItem('armory_text_model') || 'openai/gpt-oss-120b';
 }
 
 async function grokText(prompt) {
   const key = getApiKey();
   if (!key) throw new Error('No API key set. Click ⚙ Settings to add your Groq key.');
 
-  // Try 70b first, fall back to 8b-instant if rate-limited
+  // Try the chosen model first, then fall back through whatever else this key currently
+  // has access to (from the live-refreshed cache) before touching the hardcoded last resorts —
+  // that way a model Groq retires tomorrow doesn't leave this stuck on a dead id.
   const preferred = getTextModel();
-  const fallback = preferred === 'llama-3.1-8b-instant' ? 'gemma2-9b-it' : 'llama-3.1-8b-instant';
-  const models = preferred === fallback ? [preferred] : [preferred, fallback];
+  const cached = getCachedModelIds().filter(id => id !== preferred);
+  const hardcodedFallbacks = ['openai/gpt-oss-20b', 'gemma2-9b-it'].filter(id => id !== preferred);
+  const models = [preferred, ...cached, ...hardcodedFallbacks];
   let lastError = '';
 
   for (const model of models) {
@@ -2921,12 +2985,14 @@ async function grokVision(prompt, base64Image, mimeType='image/jpeg') {
   const key = getApiKey();
   if (!key) throw new Error('No API key set. Click ⚙ Settings to add your Groq key.');
 
-  // Vision model fallback chain — current as of July 2026
-  // llama-4-maverick deprecated March 2026, llama-3.2-11b-vision decommissioned
-  const visionModels = [
-    'meta-llama/llama-4-scout-17b-16e-instruct', // primary — best vision on Groq
-    'openai/gpt-oss-120b',                        // fallback — also supports image input
-  ];
+  // Vision model chain. Groq has retired the llama-4-scout/maverick vision models this app
+  // used to hardcode here, so lead with whatever multimodal-looking ids the live model cache
+  // (see refreshModelList) actually returned for this key, and only fall back to a hardcoded
+  // guess if that cache is empty (e.g. the user never hit 🔄 in Settings).
+  const cachedIds = getCachedModelIds();
+  const visionLikeCached = cachedIds.filter(id => /vision|llama-4|scout|maverick|qwen3/i.test(id));
+  const hardcodedGuess = ['qwen/qwen3.6-27b', 'openai/gpt-oss-120b'];
+  const visionModels = [...new Set([...visionLikeCached, ...hardcodedGuess])];
   let lastError = '';
 
   for (const model of visionModels) {
@@ -3575,23 +3641,12 @@ async function fetchAIDescription(g) {
   try {
     const prompt = `You are a passionate firearms historian and expert. Write an engaging, narrative description of the ${g.make} ${g.model}${g.caliber ? ' chambered in ' + g.caliber : ''}${g.year ? ', ' + g.year : ''}. Tell the story of this firearm — its origins, what makes it special, why collectors and shooters prize it, its place in history or popular culture, and what it's like to own and shoot one. ${g.serial_number && g.serial_number !== 'N/A' ? `Serial number ${g.serial_number} — note anything that can be inferred about production era or variant.` : ''} Write 3-4 flowing paragraphs in an enthusiastic but authoritative voice — the kind of description that makes a collector proud to have this piece in their vault. No bullet points, no headers, no numbered lists. Pure narrative prose.`;
 
-    // Use llama-3.1-8b-instant directly — it's a pure generative model with no reasoning/thinking
-    // mode, which produces clean narrative prose. Qwen3 (the default model) is a reasoning model
-    // that bleeds its chain-of-thought into responses regardless of suppression attempts.
-    const key = getApiKey();
-    if (!key) throw new Error('No API key');
-    const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: 1000
-      })
-    });
-    const data = await resp.json();
-    if (data.error) throw new Error(data.error.message || 'API error');
-    const text = (data.choices?.[0]?.message?.content || '').trim();
+    // Route through grokText() — it already runs the fallback chain (preferred model → live
+    // model cache → hardcoded last resorts) and strips any <think>/chain-of-thought output,
+    // so it works whether the current model is a plain generator or a reasoning model like
+    // gpt-oss. This used to call llama-3.1-8b-instant directly, which Groq has since retired.
+    const text = (await grokText(prompt)).trim();
+    if (!text) throw new Error('Empty response from model');
     // Save and lock in — once set, never auto-fetch again
     g.ai_description = text;
     save();
@@ -4640,11 +4695,28 @@ function openSettings() {
   document.getElementById('apiKeyInput').style.borderColor = '';
   document.getElementById('apiKeyInput').type = 'password';
   document.getElementById('toggleKeyBtn').textContent = 'SHOW';
-  // Populate model dropdown
+  // Populate model dropdown — prefer whatever we last pulled live from Groq, then fall
+  // back to the hardcoded defaults baked into the <select>.
   const modelSel = document.getElementById('textModelSelect');
-  if (modelSel) modelSel.value = getTextModel();
+  const cachedIds = getCachedModelIds();
+  const statusEl = document.getElementById('modelListStatus');
+  if (modelSel && cachedIds.length) {
+    modelSel.innerHTML = cachedIds.map(id => `<option value="${id}">${id}</option>`).join('');
+  }
+  if (modelSel) {
+    const wanted = getTextModel();
+    if ([...modelSel.options].some(o => o.value === wanted)) modelSel.value = wanted;
+  }
+  if (statusEl) {
+    statusEl.textContent = cachedIds.length
+      ? `Showing ${cachedIds.length} model(s) last pulled from Groq. Tap 🔄 to refresh.`
+      : `Enter your key above, then tap 🔄 to pull whatever models Groq currently serves on it.`;
+  }
   switchSettingsTab('ai');
   openModal('settingsModal');
+  // If we already have a key on file, quietly refresh in the background so the list
+  // stays current without the user needing to remember to press the button.
+  if (currentKey) refreshModelList(false);
 }
 
 function saveSettings() {
@@ -4664,6 +4736,7 @@ function saveSettings() {
   if (modelSel) localStorage.setItem('armory_text_model', modelSel.value);
   closeModal('settingsModal');
   showToast(key ? '✓ Groq API key saved' : 'API key cleared', key ? 'success' : 'info');
+  if (key) refreshModelList(false); // keep the model cache current for next time
 }
 
 function toggleKeyVisibility() {
