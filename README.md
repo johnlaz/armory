@@ -1,184 +1,127 @@
 <div align="center">
 
-# ⬡ ARMORY
-### *Firearms Inventory System*
+<img src="docs/banner.svg" alt="ARMORY — Firearms Inventory System" width="100%">
 
-**v3.0 · Professional Grade · Offline-First · AI-Powered**
+**Private, offline-first firearms inventory. Scan it. Log it. Insure it.**
 
----
-
-*Your collection deserves better than a spreadsheet.*
+[**Landing page**](https://johnlaz.github.io/armory/) · [**Open the app**](https://johnlaz.github.io/armory/app/) · [Android APK](assets/ARMORY.apk)
 
 </div>
 
 ---
 
-## What Is ARMORY?
+## What it is
 
-ARMORY is a full-featured, AI-powered firearms inventory system built as a Progressive Web App — installable on Android, iOS, Windows, and macOS without an app store. It runs entirely on your device. Your data never leaves your hands.
+ARMORY is a Progressive Web App for cataloging a firearms collection. It installs on Android, iOS, Windows and macOS straight from the browser, runs offline, and keeps your data on your device. There are no accounts and no ARMORY servers.
 
-Built by a collector, for collectors — ARMORY bridges the gap between the physical firearm in your safe and the professional digital record your insurance company needs on day one.
+<table>
+<tr>
+<td width="25%"><img src="app/shot-vault.png" alt="Vault"></td>
+<td width="25%"><img src="app/shot-detail.png" alt="Detail"></td>
+<td width="25%"><img src="app/shot-docs.png" alt="Docs"></td>
+<td width="25%" valign="middle"><sub>Screens show the built-in demo vault.</sub></td>
+</tr>
+</table>
 
----
+**Features**
 
-## The Problem It Solves
+- **Vault** — grid, tile and list views; search, filter by type / caliber / location, and ten sort orders; live firearm count, vault value and rounds fired.
+- **Scan** — point the camera at a firearm and vision AI proposes make, model and caliber. *AI fill* completes the spec sheet from make and model.
+- **Records** — full spec sheet, hero photo plus gallery, range log, maintenance checklist and log, accessories, storage location, notes.
+- **Docs** — insurance reports (single firearm or whole vault), blank or pre-filled Bill of Sale, and an ATF 4473 reference checklist. Reports open as print-ready pages; save them as PDF from the print dialog.
+- **Sold archive** — retire a firearm from the vault and keep its record.
+- **Import / export** — spreadsheet import (XLSX / CSV), Excel / CSV export, and a full JSON backup with merge or replace restore.
+- **Demo vault** — seven sample firearms with photos load into an empty vault, and can be re-added any time from *Settings → Manage*.
 
-Most collectors reach what I call the **Excel Plateau** — a half-finished spreadsheet that's tedious to maintain and offers zero peace of mind. Every new acquisition brings the same questions:
+## Live URLs
 
-- *Do I have the serial number recorded correctly?*
-- *What's this collection actually worth right now?*
-- *If something happened today, would my documentation hold up?*
+| | |
+|---|---|
+| Landing page | <https://johnlaz.github.io/armory/> |
+| App | <https://johnlaz.github.io/armory/app/> |
+| Android APK | <https://johnlaz.github.io/armory/assets/ARMORY.apk> |
 
-ARMORY answers all three. Immediately.
+## Repo layout
 
----
+```
+/index.html            landing page (installed-app launches redirect to /app/)
+/README.md
+/sw.js                 transitional worker — retires the pre-/app registration, then removes itself
+/docs/                 README visuals only (banner.svg, how-it-works.svg, icon-tile.png)
+/assets/ARMORY.apk     Android wrapper (Trusted Web Activity)
+/app/index.html        the whole app — one file
+/app/manifest.json
+/app/sw.js
+/app/icon-192.png      192 + 512, maskable-safe
+/app/icon-512.png
+/app/shot-*.png        manifest screenshots (phone ×3, desktop ×1)
+/app/demo/*.jpg        demo-vault photos
+/app/vendor/           xlsx.full.min.js (SheetJS 0.18.5, bundled so import/export work offline)
+```
 
-## Core Features
+> `/sw.js` only exists so installs made before the move to `/app/` upgrade cleanly. It can be deleted after a few months.
 
-### 📸 One-Scan Intake
-Point your camera at any firearm or its markings. The AI identifies the make, model, caliber, and technical specifications automatically — no typing required. Add a new piece to your vault in under 60 seconds.
+## AI and model setup
 
-### 🤖 The Intelligence Layer
-Powered by Groq's large language model API, ARMORY generates rich AI descriptions and manufacturer histories for every firearm in your vault. A serial number becomes a story. Specs fill themselves in. The intelligence layer runs on demand — tap **AI UPDATE SPECS** in any detail view and watch it work.
+AI features are optional and use **your own free [Groq](https://console.groq.com/keys) API key**.
 
-### 📋 Professional Spec Sheets
-Every firearm gets a complete, structured record:
+1. Open **Settings → AI**, paste a key (starts with `gsk_`), and save.
+2. The model list is pulled live from Groq when you save the key and whenever you tap 🔄.
 
-| Field | Field | Field |
-|-------|-------|-------|
-| Make & Model | Caliber | Action Type |
-| Barrel Length | Overall Length | Weight |
-| Capacity | Finish | Year of Manufacture |
-| Condition | MSRP / Est. Value | Purchase Date |
-| Storage Location | Notes | Serial Number |
+How the model picker behaves:
 
-### 📷 Photo Gallery
-Each firearm supports a **hero photo** plus an **unlimited gallery** of additional images — markings, accessories, modifications, condition documentation. Tap any thumbnail for a fullscreen lightbox viewer with swipe navigation.
+- It **merges** — models Groq currently serves are added to the three built-in choices; nothing is removed.
+- Your saved model is **never swapped automatically**. If Groq stops listing it, it stays selected and is flagged with ⚠.
+- Non-chat models (speech, TTS, guard and safeguard classifiers, embeddings) are filtered out.
+- If a call hits a rate limit or a retired model, the app tries the other available models for that request without changing your saved choice.
 
-### 💰 Live Vault Dashboard
-The header displays your vault at a glance, always up to date:
+Default text model: `openai/gpt-oss-120b`. Camera identification picks a vision-capable model from the live list.
 
-- **Firearm count** — total pieces in inventory
-- **Vault Value** — running MSRP / estimated total across all firearms
-- **Rounds Fired** — total rounds logged across your entire collection, tap to filter
+## Data and privacy
 
-### 🎯 Range Log
-Track every range session per firearm. Log rounds fired, view session history, and watch the vault-wide total update in real time. Filter your entire inventory to show only firearms with active range data.
+<img src="docs/how-it-works.svg" alt="How ARMORY handles your data" width="100%">
 
-### 🔧 Maintenance Records
-Per-firearm service tracking with:
-- Last service date picker
-- 8-task maintenance checklist (clean barrel, lubricate, inspect feed, check headspace, and more)
-- Timestamped maintenance log with free-form notes
-- Full history preserved across sessions
+- Inventory, photos, logs, notes and settings are stored in your browser's **localStorage** on your device. There is no sync and no account.
+- When you use a **scan** or **AI fill**, the photo or the make/model you entered is sent to **Groq**, using your key, and the answer comes back. Nothing is sent unless you use an AI feature.
+- Your API key is stored locally, sent only to Groq, and **never included in backups**. Re-enter it after restoring on a new device.
+- localStorage holds roughly 5 MB. *Settings → Data* shows how much you have used; photos are the main cost.
+- Clearing site data or uninstalling the app erases your vault. **Export a backup regularly.**
+- All GitHub Pages apps on `johnlaz.github.io` share one browser origin, so a stored key is visible to other apps on that origin. Keys are namespaced (`armory_*`) so they do not collide.
 
-### ⚙️ Accessories Tracker
-12 standard accessory checkboxes plus a custom field per firearm — red dot, magnified scope, suppressor, bipod, sling, laser, trigger upgrade, and more.
+## Deploy and update
 
-### 📄 Insurance-Ready Exports
+Hosted on GitHub Pages from the repository root (`main`, `/ (root)`). There is no build step.
 
-**Single Firearm Report** — open any detail view and tap **Insurance Export** to generate a print-ready HTML document with the firearm's photo, complete spec sheet, purchase date, estimated value, and a generation timestamp. Open in any browser, print to PDF.
+To ship a change:
 
-**Full Vault Report** — one tap generates a consolidated insurance document covering every firearm in your collection with a vault summary (total count, total estimated value) at the top.
+1. Edit `/app/index.html`.
+2. Bump `APP_VERSION` near the top of its main script. That one constant updates the on-screen version, the backup format version and the service-worker cache name (the app registers `sw.js?v=<version>`).
+3. If you add or remove files the app needs offline, update the `SHELL` list in `/app/sw.js`. Every listed file must exist — install fails if one is missing.
+4. Commit and push. Open installs fetch the new HTML first (network-first) and show an **ARMORY was updated — Reload** banner.
 
-### 💾 Full Backup & Restore
-A single JSON export captures everything:
-- All firearms with full specifications
-- All photos (base64 embedded)
-- Range logs, maintenance records, accessories
-- AI descriptions
-- Your API key and preferences
-- Notes and feedback entries
+**Installs and the APK.** The manifest `id` is pinned to `/armory/index.html` so installs made before the `/app/` move keep their identity. Old installs launch the landing page, which sends standalone launches to `/app/`. The APK opens the app inside the same scope (`/armory/`), so it should keep working; if it does not, rebuild it with start URL `https://johnlaz.github.io/armory/app/index.html`.
 
-**Restore** on any device — choose Merge (upsert by serial number) or Replace All. Your vault travels with you.
+## Changelog
 
-### 🔍 Search, Filter & Sort
-Find anything in your collection instantly:
+### 3.1.0
+- **Navigation:** new bottom bar — Vault · Sold · Scan · Docs · Settings. Docs is now a screen; the header keeps only the theme toggle and **+ ADD**.
+- **Settings:** four tabs (AI, Data, Manage, About) with collapsible sections; storage meter; API status moved into the AI tab.
+- **Demo vault:** photos are bundled locally (no hot-linking); *Restore Demo Vault* added; old hot-linked demo photos migrate automatically.
+- **Fix:** removed a hidden loader that replaced the whole inventory with sample data when it held three or fewer firearms without photos.
+- **Privacy:** backups no longer include the API key.
+- **Models:** refresh merges with the existing list; saved model kept and flagged, never auto-swapped.
+- **Offline:** service worker precaches the app shell; SheetJS bundled locally; update banner; cache name follows `APP_VERSION`.
+- **Manifest:** explicit `id`, maskable-safe 192 / 512 icons, working *Add* and *Scan* shortcuts, real screenshots.
+- **Exports:** photos resolve correctly inside print windows.
+- **Repo:** landing page and app merged into one repo (landing at root, app in `/app`); landing rebuilt with real screenshots and corrected privacy copy.
 
-**Filters** — Type · Caliber · Storage Location · Rounds (active filter)
-
-**Sort options:**
-- Name A→Z / Z→A
-- Make A→Z
-- Value: High to Low / Low to High
-- Year: Newest / Oldest
-- Rounds: Most Fired
-- Purchased: Newest / Oldest
-
-### 🗂 Storage Location Tracking
-Assign every firearm to a named location — Safe A, Safe B, Vault, Case, Locker, Bedside, Range Bag, Vehicle — and filter your entire inventory by location in a single tap.
-
----
-
-## The AI Stack
-
-ARMORY connects to [Groq](https://console.groq.com) — the fastest AI inference platform available — using a **free API key** that takes about 60 seconds to obtain.
-
-| Capability | Model Used |
-|-----------|-----------|
-| Spec research & AI descriptions | `llama-3.3-70b-versatile` |
-| Camera identification & vision | `meta-llama/llama-4-scout-17b` |
-| Fast fallback (rate limit) | `llama-3.1-8b-instant` |
-
-The app auto-falls back to a faster model if rate limits are hit, and all AI features degrade gracefully without a key — the rest of the app works fully offline.
-
----
-
-## Privacy Architecture
-
-ARMORY is built on a **local-first, zero-trust** architecture:
-
-- ✅ All firearms data stored in browser localStorage — never on a server
-- ✅ Photos stored as base64 on your device
-- ✅ API key stored locally — sent only to Groq's API, never to any other endpoint
-- ✅ No accounts, no sign-up, no cloud sync
-- ✅ Works fully offline after first load
-- ✅ Service worker caches all assets for offline use
-- ✅ Full JSON export gives you 100% data portability at any time
-
----
-
-## The Vault Experience
-
-ARMORY presents your collection through three optimized views:
-
-**Grid View** — Full photo cards with brand, model, caliber chips, and value at a glance
-
-**Small Tiles** — Maximum density — see your entire collection at once
-
-**List View** — Horizontal rows with inline spec chips — optimized for long collections
-
-The glassmorphism dark UI — gold accent system, frosted glass cards, neon glow on primary actions — makes every interaction feel premium. Your vault looks as good as it performs.
-
----
-
-## Feature Summary
-
-| Category | Features |
-|----------|----------|
-| **Intake** | Manual entry · AI camera scan · AI spec fill · Manufacturer logo picker |
-| **Records** | Full spec sheets · Photo gallery · Notes · Purchase date · Storage location |
-| **Operations** | Range log · Maintenance records · Accessories tracker |
-| **Intelligence** | AI descriptions · Spec research · Camera identification |
-| **Vault** | Live value total · Round count · Firearm count · Multi-sort · Multi-filter |
-| **Exports** | Single insurance PDF · Full vault PDF · Excel · CSV · JSON backup |
-| **Security** | Local-only storage · No accounts · Offline-capable · Full data export |
-| **Platform** | PWA — Android · iOS · Windows · macOS · Desktop browser |
-
----
-
-## About
-
-ARMORY was built by a collector who got tired of the Excel Plateau. What started as a personal utility — a way to bring order to a growing investment — became a platform built on two principles: **utility** and **privacy**.
-
-The technical rigor of a developer. The passion of a collector. The peace of mind of a professional.
-
-*Built on the Lazzaro Standard.*
+### 3.0
+- Initial public release.
 
 ---
 
 <div align="center">
 
-**ARMORY v3.0** · © 2025 Lazzaro Standard · All data stays on your device
+© 2026 LAZLAB Creations. All Rights Reserved. · [lazlab.io@gmail.com](mailto:lazlab.io@gmail.com)
 
 </div>
