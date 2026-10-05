@@ -14,14 +14,17 @@
 
 ARMORY is a Progressive Web App for cataloging a firearms collection. It installs on Android, iOS, Windows and macOS straight from the browser, runs offline, and keeps your data on your device. There are no accounts and no ARMORY servers.
 
-<table>
-<tr>
-<td width="25%"><img src="app/shot-vault.png" alt="Vault"></td>
-<td width="25%"><img src="app/shot-detail.png" alt="Detail"></td>
-<td width="25%"><img src="app/shot-docs.png" alt="Docs"></td>
-<td width="25%" valign="middle"><sub>Screens show the built-in demo vault.</sub></td>
-</tr>
-</table>
+<p align="center">
+  <img src="app/shot-vault.png"  alt="Vault — your collection at a glance" width="31%">
+  <img src="app/shot-detail.png" alt="Detail — photo and full spec sheet" width="31%">
+  <img src="app/shot-docs.png"   alt="Docs — bill of sale, 4473 checklist and insurance reports" width="31%">
+</p>
+<p align="center"><sub><b>Vault</b> · <b>Detail</b> · <b>Docs</b> — phone screens show the built-in demo vault.</sub></p>
+
+<p align="center">
+  <img src="docs/vault-full.png" alt="A full vault: 35 firearms in grid view with live totals, filters and sorting" width="72%">
+</p>
+<p align="center"><sub><b>A full vault</b> — 35 firearms, live totals, filters and sorting. Serial numbers are hidden in this screenshot.</sub></p>
 
 **Features**
 
@@ -47,13 +50,14 @@ ARMORY is a Progressive Web App for cataloging a firearms collection. It install
 /index.html            landing page (installed-app launches redirect to /app/)
 /README.md
 /sw.js                 transitional worker — retires the pre-/app registration, then removes itself
-/docs/                 README visuals only (banner.svg, how-it-works.svg, icon-tile.png)
+/docs/                 README visuals only (banner.svg, how-it-works.svg, vault-full.png)
 /assets/ARMORY.apk     Android wrapper (Trusted Web Activity)
 /app/index.html        the whole app — one file
 /app/manifest.json
 /app/sw.js
 /app/icon-192.png      192 + 512, maskable-safe
 /app/icon-512.png
+/app/icon-tile.png     cropped logo used by the landing page
 /app/shot-*.png        manifest screenshots (phone ×3, desktop ×1)
 /app/demo/*.jpg        demo-vault photos
 /app/vendor/           xlsx.full.min.js (SheetJS 0.18.5, bundled so import/export work offline)
