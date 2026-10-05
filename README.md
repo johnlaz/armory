@@ -105,6 +105,10 @@ To ship a change:
 
 ### 3.1.0
 - **Navigation:** new bottom bar — Vault · Sold · Scan · Docs · Settings. Docs is now a screen; the header keeps only the theme toggle and **+ ADD**.
+- **Back button:** Back never exits by accident. It closes the top-most layer first (prompt → photo viewer → guide → dialog → select mode → search), then returns any sub-screen to the Vault. At the Vault a second Back within 2.5 s is required to leave. Backing out of an edited firearm form asks *Discard changes?* first. Esc does the same on desktop.
+- **Themes:** fixed unreadable text in both themes — hint and label text now meets WCAG AA (4.5:1) on every screen, dialog, toast and banner; gold text uses a darker bronze in light mode; dropdowns and their option lists follow the app theme on every platform; the status bar colour follows the theme.
+- **Dialogs and notifications:** prompts, dialogs and photo viewers now cover the header and bottom nav (they used to sit underneath them); toasts always float above everything.
+- **Fix:** closing the camera no longer throws a stack-overflow error (present since 3.0).
 - **Settings:** four tabs (AI, Data, Manage, About) with collapsible sections; storage meter; API status moved into the AI tab.
 - **Demo vault:** photos are bundled locally (no hot-linking); *Restore Demo Vault* added; old hot-linked demo photos migrate automatically.
 - **Fix:** removed a hidden loader that replaced the whole inventory with sample data when it held three or fewer firearms without photos.
