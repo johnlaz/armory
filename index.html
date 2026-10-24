@@ -21,7 +21,11 @@
 (function(){try{
   var m=function(q){return window.matchMedia&&window.matchMedia(q).matches};
   var installed=m('(display-mode: standalone)')||m('(display-mode: minimal-ui)')||window.navigator.standalone===true||(document.referrer||'').indexOf('android-app://')===0;
-  if(installed&&!/[?&]landing\b/.test(location.search)) location.replace('./app/'+location.search+location.hash);
+  var ref=document.referrer||'';
+  /* Only a true launch (home screen / TWA: no referrer or android-app://) skips the landing page.
+     A link click from another page, or this page inside an iframe (e.g. Nexus running standalone), keeps it. */
+  var launched=(ref===''||ref.indexOf('android-app://')===0)&&window.top===window.self;
+  if(installed&&launched&&!/[?&]landing\b/.test(location.search)) location.replace('./app/'+location.search+location.hash);
 }catch(e){}})();
 </script>
 <noscript><style>.reveal{opacity:1!important;transform:none!important}</style></noscript>
