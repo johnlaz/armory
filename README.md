@@ -33,8 +33,8 @@ ARMORY is a Progressive Web App for cataloging a firearms collection. It install
 - **Records** — full spec sheet, hero photo plus gallery, range log, maintenance checklist and log, accessories, storage location, notes.
 - **Docs** — insurance reports (single firearm or whole vault), blank or pre-filled Bill of Sale, and an ATF 4473 reference checklist. Reports open as print-ready pages; save them as PDF from the print dialog.
 - **Sold archive** — retire a firearm from the vault and keep its record.
-- **Import / export** — spreadsheet import (XLSX / CSV), Excel / CSV export, and a full JSON backup with merge or replace restore.
-- **Demo vault** — seven sample firearms with photos load into an empty vault, and can be re-added any time from *Settings → Manage*.
+- **Import / export** — spreadsheet import (XLSX / CSV), Excel / CSV export, and a full JSON backup with merge or replace restore, and an **offline copy** (see changelog 3.2.0).
+- **Demo vault** — seven sample firearms with photos load into an empty vault, and can be re-added any time from *Settings → Vault tools*.
 
 ## Live URLs
 
@@ -69,7 +69,7 @@ ARMORY is a Progressive Web App for cataloging a firearms collection. It install
 
 AI features are optional and use **your own free [Groq](https://console.groq.com/keys) API key**.
 
-1. Open **Settings → AI**, paste a key (starts with `gsk_`), and save.
+1. Open **Settings → AI assistant** and paste a key (starts with `gsk_`) — it saves automatically.
 2. The model list is pulled live from Groq when you save the key and whenever you tap 🔄.
 
 How the model picker behaves:
@@ -88,7 +88,7 @@ Default text model: `openai/gpt-oss-120b`. Camera identification picks a vision-
 - Inventory, photos, logs, notes and settings are stored in your browser's **localStorage** on your device. There is no sync and no account.
 - When you use a **scan** or **AI fill**, the photo or the make/model you entered is sent to **Groq**, using your key, and the answer comes back. Nothing is sent unless you use an AI feature.
 - Your API key is stored locally, sent only to Groq, and **never included in backups**. Re-enter it after restoring on a new device.
-- localStorage holds roughly 5 MB. *Settings → Data* shows how much you have used; photos are the main cost.
+- localStorage holds roughly 5 MB. The bar on the *Settings* home screen shows how much you have used; photos are the main cost.
 - Clearing site data or uninstalling the app erases your vault. **Export a backup regularly.**
 - All GitHub Pages apps on `johnlaz.github.io` share one browser origin, so a stored key is visible to other apps on that origin. Keys are namespaced (`armory_*`) so they do not collide.
 
@@ -106,6 +106,12 @@ To ship a change:
 **Installs and the APK.** The manifest `id` is pinned to `/armory/index.html` so installs made before the `/app/` move keep their identity. Old installs launch the landing page, which sends standalone launches to `/app/`. The APK opens the app inside the same scope (`/armory/`), so it should keep working; if it does not, rebuild it with start URL `https://johnlaz.github.io/armory/app/index.html`.
 
 ## Changelog
+
+### 3.2.0
+- **Offline copy ("bake"):** *Settings → Backup & offline copy → Bake offline copy* writes one self-contained `.html` — the app, the Excel library, the demo photos and your whole vault (firearms, photos, range logs, maintenance, sold records, notes) all inlined. Open it in any browser with no internet and no install; on first open it loads the baked vault into that browser's storage. Opening a newer offline copy on a browser that already has a vault asks before replacing it. Restore also accepts an offline copy (`.json` or `.html`).
+- **Settings redesign:** the four tabs and collapsible sections are replaced by a simple list — AI assistant · Backup & offline copy · Spreadsheets · Vault tools · About & help — each opening its own page with a back button. Hardware Back climbs one level first. The key and model save automatically (no Save button); the list shows live status such as the saved key and last backup date.
+- **Backups now include sold records** (they were missing from the JSON backup); restore handles them in merge and replace.
+- **Fix:** the About text claimed backups included the API key; they never do.
 
 ### 3.1.0
 - **Navigation:** new bottom bar — Vault · Sold · Scan · Docs · Settings. Docs is now a screen; the header keeps only the theme toggle and **+ ADD**.

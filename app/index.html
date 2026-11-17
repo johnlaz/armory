@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- ARMORY v3.1.0 · © 2026 LAZLAB Creations. All Rights Reserved. -->
+<!-- ARMORY v3.2.0 · © 2026 LAZLAB Creations. All Rights Reserved. -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -22,7 +22,7 @@
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   ARMORY v3.1.0 — iOS Dark Mode Design System
+   ARMORY v3.2.0 — iOS Dark Mode Design System
    Lazzaro Standard · Premium Firearms Vault
    ═══════════════════════════════════════════════════════════ */
 
@@ -317,7 +317,7 @@ header {
 }
 
 /* Readability: helper text on dark surfaces */
-.stab-panel .settings-hint, .docs-wrap .settings-hint, .docs-wrap .screen-sub, .screen-sub { color: var(--text-secondary); }
+.sp .settings-hint, .docs-wrap .settings-hint, .docs-wrap .screen-sub, .screen-sub { color: var(--text-secondary); }
 
 /* ═══════════════ THEME HARDENING (v3.1) ═══════════════ */
 :root {
@@ -1714,23 +1714,6 @@ select.filter-select:focus { border-color: var(--accent); }
 /* ═══════════════════════════════════════════════════════════
    SETTINGS
    ═══════════════════════════════════════════════════════════ */
-.stab-row {
-  display: flex;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  position: sticky;
-  top: -20px; /* offset modal-body padding */
-  z-index: 10;
-  background: var(--bg-secondary);
-  border-bottom: 0.5px solid var(--separator);
-  margin: -20px -20px 16px;
-  padding: 0 16px;
-}
-.stab-row::-webkit-scrollbar { display: none; }
-@media (max-width: 640px) {
-  .stab-row { top: -16px; margin: -16px -16px 14px; }
-}
 .stab {
   font-family: var(--font);
   font-size: 13px;
@@ -1747,8 +1730,71 @@ select.filter-select:focus { border-color: var(--accent); }
 }
 .stab:hover { color: var(--text-secondary); }
 .stab.active { color: var(--accent-fg); border-bottom-color: var(--accent); }
-.stab-panel  { display: none; }
-.stab-panel.active { display: block; }
+
+/* Settings v2 — drill-down list: Home → page, with a back button. Replaces the tab strip + collapsibles. */
+.sm-header { gap: 10px; }
+.sm-header .modal-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sm-back {
+  background: none; border: none; color: var(--accent-fg); font-family: var(--font);
+  font-size: 15px; font-weight: 600; cursor: pointer; padding: 6px 8px 6px 0; min-height: 36px;
+  display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0;
+}
+.sm-back[hidden] { display: none; }
+.sm-back:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+.sp { display: none; }
+.sp.active { display: block; animation: spIn var(--dur-fast) var(--ease-ios); }
+@keyframes spIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
+
+.sm-group {
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--separator-soft);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.sm-row {
+  display: flex; align-items: center; gap: 14px; width: 100%;
+  background: none; border: none; border-bottom: 0.5px solid var(--separator-soft);
+  padding: 12px 14px; min-height: 60px; cursor: pointer; text-align: left;
+  font-family: var(--font); color: var(--text-primary);
+  transition: background var(--dur-fast) var(--ease-ios);
+}
+.sm-row:last-child { border-bottom: none; }
+.sm-row:hover, .sm-row:active { background: var(--fill-tertiary); }
+.sm-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sm-ico {
+  width: 38px; height: 38px; flex-shrink: 0; border-radius: 10px;
+  background: var(--accent-soft); display: flex; align-items: center; justify-content: center; font-size: 19px;
+}
+.sm-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sm-txt strong { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+.sm-txt small { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+.sm-txt small.warn { color: var(--accent-fg); }
+.sm-chev { color: var(--text-tertiary); font-size: 22px; line-height: 1; flex-shrink: 0; }
+
+.sm-card {
+  background: var(--bg-secondary);
+  border: 0.5px solid var(--separator-soft);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.sm-card-hero { border-color: var(--accent-border, var(--accent-dim)); background: linear-gradient(180deg, var(--accent-soft), var(--bg-secondary) 70%); }
+.sm-card-danger { border-color: rgba(255,69,58,0.35); }
+.sm-card-title {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 14px; font-weight: 600; color: var(--text-primary); margin-bottom: 10px;
+}
+.sm-pill {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 600;
+  letter-spacing: .5px; color: var(--text-secondary); background: var(--bg-tertiary);
+  padding: 4px 9px; border-radius: 99px;
+}
+.sm-meter { padding: 4px 4px 0; font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+.sm-meter-bar { height: 4px; border-radius: 4px; background: var(--bg-tertiary); overflow: hidden; margin-bottom: 6px; }
+.sm-meter-bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.sm-meter-bar.hot i { background: var(--red); }
+.sp .settings-hint { color: var(--text-secondary); }
 
 .settings-section {
   border: 0.5px solid var(--separator-soft);
@@ -2171,7 +2217,7 @@ select.filter-select:focus { border-color: var(--accent); }
   <div class="as-logo" style="font-size:72px;color:var(--accent-fg);">⬡</div>
   <div class="as-name">ARMORY</div>
   <div class="as-tag">FIREARMS INVENTORY SYSTEM</div>
-  <div class="as-ver" data-app-version>v3.1.0</div>
+  <div class="as-ver" data-app-version>v3.2.0</div>
   <button class="as-enter" onclick="splashEnter()">Enter →</button>
 </div>
 
@@ -2602,66 +2648,128 @@ select.filter-select:focus { border-color: var(--accent); }
 </div>
 
 <div class="modal-overlay" id="settingsModal">
-  <div class="modal" style="max-width:700px;width:95vw;height:85vh;display:flex;flex-direction:column">
+  <div class="modal sm-modal" style="max-width:640px;width:95vw;height:85vh;display:flex;flex-direction:column">
 
-    
-    <div class="modal-header">
-      <span class="modal-title">Settings</span>
-      <button class="modal-close" onclick="closeModal('settingsModal')">✕</button>
+    <div class="modal-header sm-header">
+      <button class="sm-back" id="smBack" onclick="settingsBack()" aria-label="Back to Settings" hidden>‹ <span>Settings</span></button>
+      <span class="modal-title" id="smTitle">Settings</span>
+      <button class="modal-close" onclick="closeModal('settingsModal')" aria-label="Close">✕</button>
     </div>
 
-    
-    <!-- Settings tab strip — sticky, scrollable horizontally, outside modal-body scroll -->
-    <div style="display:flex;border-bottom:0.5px solid var(--separator);background:var(--bg-secondary);flex-shrink:0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch">
-      <button class="stab active" id="stab-ai"     onclick="switchSettingsTab('ai')"     style="flex:1;min-width:64px">🤖 AI</button>
-      <button class="stab"        id="stab-data"   onclick="switchSettingsTab('data')"   style="flex:1;min-width:64px">💾 Data</button>
-      <button class="stab"        id="stab-danger" onclick="switchSettingsTab('danger')" style="flex:1;min-width:64px">⚠ Manage</button>
-      <button class="stab"        id="stab-about"  onclick="switchSettingsTab('about')"  style="flex:1;min-width:64px">ℹ About</button>
-    </div>
+    <div class="modal-body" id="smBody">
 
-    <div class="modal-body">
+      <!-- ═════════ HOME ═════════ -->
+      <div class="sp active" id="sp-home">
 
-      
-      <div class="stab-panel active" id="spanel-ai">
-
-        <div class="settings-section">
-          <div class="settings-section-title">GROQ API KEY</div>
-          <div id="apiStatusBadge" class="settings-hint" style="display:flex;align-items:center;gap:6px;margin:-4px 0 10px"><span id="apiStatusDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#555;transition:background .3s"></span><span id="apiStatusText">API: NOT SET</span></div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <input class="form-input" type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off" style="flex:1">
-            <button class="btn" onclick="toggleKeyVisibility()" id="toggleKeyBtn" style="flex-shrink:0;min-width:64px">SHOW</button>
-          </div>
-          <div class="settings-hint">
-            Required for AI descriptions, camera scanning, and spec lookups.<br>
-            Stored locally on your device only — never sent to any server.
-          </div>
-          <a href="https://console.groq.com" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">🔑 GET FREE API KEY</a>
+        <div class="sm-group">
+          <button class="sm-row" onclick="settingsGo('ai')">
+            <span class="sm-ico">🤖</span>
+            <span class="sm-txt"><strong>AI assistant</strong><small id="smSubAi">Groq key &amp; model</small></span>
+            <span class="sm-chev">›</span>
+          </button>
+          <button class="sm-row" onclick="settingsGo('backup')">
+            <span class="sm-ico">💾</span>
+            <span class="sm-txt"><strong>Backup &amp; offline copy</strong><small id="smSubBackup">Save, restore, take it offline</small></span>
+            <span class="sm-chev">›</span>
+          </button>
+          <button class="sm-row" onclick="settingsGo('sheets')">
+            <span class="sm-ico">📊</span>
+            <span class="sm-txt"><strong>Spreadsheets</strong><small>Import or export Excel / CSV</small></span>
+            <span class="sm-chev">›</span>
+          </button>
         </div>
 
-        <div class="settings-section">
-          <div class="settings-section-title">AI TEXT MODEL</div>
+        <div class="sm-group">
+          <button class="sm-row" onclick="settingsGo('tools')">
+            <span class="sm-ico">🧰</span>
+            <span class="sm-txt"><strong>Vault tools</strong><small>Demo vault · clear inventory</small></span>
+            <span class="sm-chev">›</span>
+          </button>
+          <button class="sm-row" onclick="settingsGo('about')">
+            <span class="sm-ico">ℹ️</span>
+            <span class="sm-txt"><strong>About &amp; help</strong><small><span data-app-version>v3.2.0</span> · guide, notes, our story</small></span>
+            <span class="sm-chev">›</span>
+          </button>
+        </div>
+
+        <div class="sm-meter" id="storageInfo"></div>
+      </div>
+
+      <!-- ═════════ AI ═════════ -->
+      <div class="sp" id="sp-ai">
+        <div class="sm-card">
+          <div class="sm-card-title">Groq API key
+            <span id="apiStatusBadge" class="sm-pill"><span id="apiStatusDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#555;transition:background .3s"></span><span id="apiStatusText">API: NOT SET</span></span>
+          </div>
           <div style="display:flex;gap:8px;margin-bottom:8px">
-            <select class="form-input" id="textModelSelect" style="font-family:var(--font);font-size:12px;flex:1">
+            <input class="form-input" type="password" id="apiKeyInput" placeholder="gsk_..." autocomplete="off" style="flex:1" onchange="saveApiKey()">
+            <button class="btn" onclick="toggleKeyVisibility()" id="toggleKeyBtn" style="flex-shrink:0;min-width:64px">SHOW</button>
+          </div>
+          <p class="settings-hint">Powers AI descriptions, camera scanning and spec lookups. Stored on this device only — saves automatically.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+            <a href="https://console.groq.com/keys" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none">🔑 GET A FREE KEY</a>
+            <button class="btn" onclick="removeApiKey()">REMOVE KEY</button>
+          </div>
+        </div>
+
+        <div class="sm-card">
+          <div class="sm-card-title">AI text model</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <select class="form-input" id="textModelSelect" style="font-family:var(--font);font-size:12px;flex:1" onchange="saveModelChoice()">
               <option value="openai/gpt-oss-120b">openai/gpt-oss-120b — Most capable · slower</option>
               <option value="openai/gpt-oss-20b">openai/gpt-oss-20b — Fast · lower token use</option>
               <option value="qwen/qwen3.6-27b">qwen/qwen3.6-27b — Legacy · being retired by Groq</option>
             </select>
             <button class="btn" onclick="refreshModelList(true)" id="refreshModelsBtn" style="flex-shrink:0;min-width:44px" title="Pull the current model list from Groq using this key">🔄</button>
           </div>
-          <div class="settings-hint" id="modelListStatus">Enter your key above, then tap 🔄 to pull whatever models Groq currently serves on it — keeps this list from going stale whenever Groq retires a model.</div>
+          <div class="settings-hint" id="modelListStatus">Enter your key above, then tap 🔄 to pull whatever models Groq currently serves on it.</div>
         </div>
-
       </div>
 
-      
-      <div class="stab-panel" id="spanel-data">
+      <!-- ═════════ BACKUP & OFFLINE ═════════ -->
+      <div class="sp" id="sp-backup">
 
-        <div class="settings-hint" id="storageInfo" style="margin:0 2px 12px"></div>
+        <div class="sm-card sm-card-hero" id="bakeCard">
+          <div class="sm-card-title">📴 Offline copy</div>
+          <p class="settings-hint" id="bakeHint" style="margin-bottom:12px">One .html file with the whole app <em>and</em> your vault baked in — photos, range logs, maintenance, sold records. Open it in any browser with no internet and no install. Keep it on a USB stick or send it to another phone.</p>
+          <button class="btn btn-primary" id="bakeBtn" style="width:100%" onclick="exportBake()">📴 BAKE OFFLINE COPY (.html)</button>
+          <div class="settings-hint" id="bakeInfo" style="text-align:center;min-height:16px;margin-top:6px"></div>
+        </div>
 
-        
-        <details class="settings-section settings-collapse">
-          <summary class="settings-section-title">📥 IMPORT SPREADSHEET</summary>
-          <p class="settings-hint" style="margin-bottom:12px">Upload an Excel (.xlsx) or CSV file to add firearms. Download the template to see the required format.</p>
+        <div class="sm-card">
+          <div class="sm-card-title">🗄 Backup file</div>
+          <p class="settings-hint" style="margin-bottom:12px">A .json with everything, for moving to a new device or restoring later. Your API key is never included.</p>
+          <button class="btn" style="width:100%" onclick="exportJSON()">EXPORT BACKUP (.json)</button>
+          <div class="settings-hint" id="jsonExportInfo" style="text-align:center;min-height:16px;margin-top:6px"></div>
+        </div>
+
+        <div class="sm-card">
+          <div class="sm-card-title">♻ Restore</div>
+          <div class="ie-drop-zone" id="jsonDropZone"
+            onclick="document.getElementById('jsonFileInput').click()"
+            ondragover="event.preventDefault();this.classList.add('drag-over')"
+            ondragleave="this.classList.remove('drag-over')"
+            ondrop="handleJSONDrop(event)"
+            style="padding:14px;margin-bottom:10px">
+            <div class="ie-drop-icon" style="font-size:24px;margin-bottom:4px">📂</div>
+            <strong>TAP OR DROP A BACKUP (.json) OR OFFLINE COPY (.html)</strong>
+          </div>
+          <input type="file" id="jsonFileInput" style="display:none" accept=".json,.html,application/json,text/html" onchange="importJSONFile(event,'pending')">
+          <div id="jsonActions" style="display:none">
+            <div class="settings-hint" id="jsonImportInfo" style="margin-bottom:8px;text-align:center;color:var(--accent-fg)"></div>
+            <div style="display:flex;gap:8px">
+              <button class="btn" style="flex:1" onclick="importJSONConfirm('merge')">MERGE</button>
+              <button class="btn btn-danger" style="flex:1" onclick="importJSONConfirm('replace')">REPLACE ALL</button>
+            </div>
+            <p class="settings-hint" style="margin-top:8px"><strong>Merge</strong> adds new firearms and updates matches (by serial number). <strong>Replace</strong> swaps your whole vault for the file.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═════════ SPREADSHEETS ═════════ -->
+      <div class="sp" id="sp-sheets">
+        <div class="sm-card">
+          <div class="sm-card-title">📥 Import</div>
           <div class="ie-drop-zone" id="dropZone"
             onclick="document.getElementById('fileInput').click()"
             ondragover="event.preventDefault();this.classList.add('drag-over')"
@@ -2669,135 +2777,77 @@ select.filter-select:focus { border-color: var(--accent); }
             ondrop="handleFileDrop(event)"
             style="padding:14px;margin-bottom:10px">
             <div class="ie-drop-icon" style="font-size:24px;margin-bottom:4px">📂</div>
-            <strong>CLICK OR DRAG .xlsx / .csv HERE</strong>
+            <strong>TAP OR DROP AN .xlsx / .csv</strong>
           </div>
           <input type="file" id="fileInput" style="display:none" accept=".xlsx,.xls,.csv" onchange="importFile(event)">
+          <button class="btn" style="width:100%" onclick="downloadTemplate()">⬇ DOWNLOAD TEMPLATE</button>
+          <p class="settings-hint" style="margin-top:10px">Columns: make · model · type · caliber · serial_number · barrel_length · overall_length · weight · finish · capacity · action · year · condition · value · notes</p>
+        </div>
+        <div class="sm-card">
+          <div class="sm-card-title">📤 Export</div>
           <div style="display:flex;gap:8px">
-            <button class="btn btn-primary" style="flex:1" onclick="document.getElementById('fileInput').click()">BROWSE FILE</button>
-            <button class="btn" style="flex:1" onclick="downloadTemplate()">⬇ TEMPLATE</button>
-          </div>
-          <div class="settings-hint" style="margin-top:10px">Columns: make · model · type · caliber · serial_number · barrel_length · overall_length · weight · finish · capacity · action · year · condition · value · notes</div>
-        </details>
-
-        
-        <details class="settings-section settings-collapse">
-          <summary class="settings-section-title">📤 EXPORT INVENTORY</summary>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <button class="btn btn-primary" style="width:100%" onclick="exportInventory()">EXPORT AS EXCEL (.xlsx)</button>
-            <button class="btn" style="width:100%" onclick="exportInventoryCSV()">EXPORT AS CSV</button>
-          </div>
-        </details>
-
-        
-        <div class="settings-section" style="border-color:var(--accent-dim)">
-          <div class="settings-section-title" style="color:var(--accent-fg)">🗄 FULL BACKUP (JSON)</div>
-          <p class="settings-hint" style="margin-bottom:14px">One file contains everything — all firearms with photos, range logs, maintenance, accessories, AI descriptions, model preference, and notes. Your API key is never included — re-enter it on the new device. Restores completely on any device.</p>
-          <button class="btn btn-primary" style="width:100%;margin-bottom:6px" onclick="exportJSON()">EXPORT FULL BACKUP (.json)</button>
-          <div class="settings-hint" id="jsonExportInfo" style="text-align:center;min-height:16px"></div>
-
-          <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
-            <div class="settings-section-title" style="margin-bottom:8px">♻ RESTORE FROM BACKUP</div>
-            <div class="ie-drop-zone" id="jsonDropZone"
-              onclick="document.getElementById('jsonFileInput').click()"
-              ondragover="event.preventDefault();this.classList.add('drag-over')"
-              ondragleave="this.classList.remove('drag-over')"
-              ondrop="handleJSONDrop(event)"
-              style="padding:14px;margin-bottom:10px">
-              <div class="ie-drop-icon" style="font-size:24px;margin-bottom:4px">📂</div>
-              <strong>CLICK OR DRAG .json BACKUP FILE</strong>
-            </div>
-            <input type="file" id="jsonFileInput" style="display:none" accept=".json" onchange="importJSONFile(event,'pending')">
-            <div style="display:flex;gap:8px">
-              <button class="btn" style="flex:1" onclick="importJSONConfirm('merge')">MERGE</button>
-              <button class="btn btn-danger" style="flex:1" onclick="importJSONConfirm('replace')">REPLACE ALL</button>
-            </div>
-            <div class="settings-hint" id="jsonImportInfo" style="margin-top:8px;text-align:center;min-height:16px"></div>
+            <button class="btn btn-primary" style="flex:1" onclick="exportInventory()">EXCEL (.xlsx)</button>
+            <button class="btn" style="flex:1" onclick="exportInventoryCSV()">CSV</button>
           </div>
         </div>
-
       </div>
 
-      
-      <div class="stab-panel" id="spanel-danger">
-
-        <details class="settings-section settings-collapse" open>
-          <summary class="settings-section-title">🎬 DEMO VAULT</summary>
-          <p class="settings-hint" style="margin-bottom:14px">Re-adds the seven sample firearms (with photos) to your vault. Anything already there — including your own entries — is left untouched.</p>
-          <button class="btn btn-primary" style="width:100%" onclick="restoreDemoVault()">🎬 RESTORE DEMO VAULT</button>
-        </details>
-
-        <details class="settings-section settings-collapse">
-          <summary class="settings-section-title">CLEAR ALL INVENTORY</summary>
-          <p class="settings-hint" style="margin-bottom:14px">Permanently removes every firearm from your vault. This cannot be undone. Export a full backup first.</p>
-          <button class="btn btn-danger" onclick="armoryConfirm({icon:'🗑',title:'Clear All Inventory',body:'This will permanently delete every firearm from your vault. Export a full backup first. This cannot be undone.',confirmLabel:'CLEAR ALL',danger:true,onConfirm:()=>{inventory=[];save();renderInventory();updateStats();closeModal('settingsModal');showToast('Inventory cleared','info')}})">🗑 CLEAR ALL INVENTORY</button>
-        </details>
-
-        <details class="settings-section settings-collapse">
-          <summary class="settings-section-title">RESET INTRO GUIDE</summary>
-          <p class="settings-hint" style="margin-bottom:14px">The onboarding guide will show again next time the app loads.</p>
-          <button class="btn" onclick="showIntro()">📖 OPEN INTRO GUIDE</button>
-        </details>
-
-        <details class="settings-section settings-collapse">
-          <summary class="settings-section-title">CLEAR API KEY</summary>
-          <p class="settings-hint" style="margin-bottom:14px">Removes your stored Groq API key. AI features will stop working until a new key is added.</p>
-          <button class="btn btn-danger" onclick="armoryConfirm({icon:'🔑',title:'Remove API Key',body:'Your stored Groq API key will be deleted. AI features will stop working until a new key is added.',confirmLabel:'REMOVE',danger:true,onConfirm:()=>{localStorage.removeItem('armory_api_key');document.getElementById('apiKeyInput').value='';updateApiStatus();closeModal('settingsModal');showToast('API key removed','info')}})">🔑 REMOVE API KEY</button>
-        </details>
-
+      <!-- ═════════ VAULT TOOLS ═════════ -->
+      <div class="sp" id="sp-tools">
+        <div class="sm-card">
+          <div class="sm-card-title">🎬 Demo vault</div>
+          <p class="settings-hint" style="margin-bottom:12px">Re-adds the seven sample firearms (with photos). Anything already in your vault is left untouched.</p>
+          <button class="btn btn-primary" style="width:100%" onclick="restoreDemoVault()">RESTORE DEMO VAULT</button>
+        </div>
+        <div class="sm-card sm-card-danger">
+          <div class="sm-card-title" style="color:var(--red)">Danger zone</div>
+          <p class="settings-hint" style="margin-bottom:12px">Permanently removes every firearm from your vault. Make a backup first — this can't be undone.</p>
+          <button class="btn btn-danger" style="width:100%" onclick="armoryConfirm({icon:'🗑',title:'Clear All Inventory',body:'This will permanently delete every firearm from your vault. Export a full backup first. This cannot be undone.',confirmLabel:'CLEAR ALL',danger:true,onConfirm:()=>{inventory=[];save();renderInventory();updateStats();closeModal('settingsModal');showToast('Inventory cleared','info')}})">🗑 CLEAR ALL INVENTORY</button>
+        </div>
       </div>
 
-      
-      <div class="stab-panel" id="spanel-about">
+      <!-- ═════════ ABOUT ═════════ -->
+      <div class="sp" id="sp-about">
 
-        <div style="text-align:center;padding:16px 0 24px">
-          <div style="font-family:var(--heading);font-size:42px;letter-spacing:6px;color:var(--accent-fg);text-shadow:0 0 24px rgba(200,168,75,0.35)">⬡ ARMORY</div>
-          <div style="font-family:var(--font);font-size:11px;letter-spacing:3px;color:var(--text-dim);margin-top:4px">FIREARMS INVENTORY SYSTEM · <span data-app-version>v3.1.0</span></div>
+        <div style="text-align:center;padding:4px 0 18px">
+          <div style="font-family:var(--heading);font-size:38px;letter-spacing:6px;color:var(--accent-fg);text-shadow:0 0 24px rgba(200,168,75,0.35)">⬡ ARMORY</div>
+          <div style="font-family:var(--font);font-size:11px;letter-spacing:3px;color:var(--text-dim);margin-top:4px">FIREARMS INVENTORY SYSTEM · <span data-app-version>v3.2.0</span></div>
         </div>
 
-        <div class="settings-section">
+        <div class="sm-group">
+          <button class="sm-row" onclick="closeModal('settingsModal');setTimeout(showIntro,150)">
+            <span class="sm-ico">📖</span><span class="sm-txt"><strong>Intro guide</strong></span><span class="sm-chev">›</span>
+          </button>
+          <button class="sm-row" onclick="closeModal('settingsModal');setTimeout(openFeedback,150)">
+            <span class="sm-ico">📝</span><span class="sm-txt"><strong>Notes &amp; feedback</strong></span><span class="sm-chev">›</span>
+          </button>
+          <button class="sm-row" onclick="closeModal('settingsModal');setTimeout(()=>openArmoryOv('armory-story'),150)">
+            <span class="sm-ico">🎖</span><span class="sm-txt"><strong>Our story</strong></span><span class="sm-chev">›</span>
+          </button>
+        </div>
+
+        <div class="sm-card">
           <p style="font-size:13px;color:var(--text-secondary);line-height:1.8;margin:0">
-            ARMORY is a professional-grade, offline-first firearms inventory system built as a Progressive Web App. Installable on Android, iOS, Windows, and macOS — no app store required. All data lives exclusively on your device. Nothing is uploaded, tracked, or shared.
+            ARMORY is an offline-first firearms inventory built as a Progressive Web App. Installable on Android, iOS, Windows and macOS — no app store required. All data lives on your device. Nothing is uploaded, tracked or shared.
           </p>
         </div>
 
-        <div class="settings-section">
-          <div class="settings-section-title">FEATURE SET</div>
-          <div class="about-feature-grid">
-            <div class="about-feature-tile"><strong>📋 INVENTORY</strong>Full spec sheets per firearm — make, model, caliber, barrel, weight, condition, value, purchase date, storage location, and photos.</div>
-            <div class="about-feature-tile"><strong>🤖 AI ENGINE</strong>Groq-powered AI identifies firearms from camera photos, auto-fills specs, and writes detailed AI descriptions on demand.</div>
-            <div class="about-feature-tile"><strong>🎯 RANGE LOG</strong>Log rounds per session per firearm. Live vault-wide total in the header. Click to filter only firearms with range data.</div>
-            <div class="about-feature-tile"><strong>🔧 MAINTENANCE</strong>Service date, 8-task checklist, and timestamped maintenance log entries per firearm.</div>
-            <div class="about-feature-tile"><strong>📸 PHOTO GALLERY</strong>Hero photo plus unlimited gallery images per firearm with a fullscreen lightbox viewer.</div>
-            <div class="about-feature-tile"><strong>📁 DOCUMENTS</strong>Attach files (receipts, photos, PDFs) per firearm. Generate Bill of Sale, ATF 4473 checklist, and insurance reports on demand.</div>
-            <div class="about-feature-tile"><strong>💾 FULL BACKUP</strong>One JSON file backs up everything including your API key and notes. Full restore on any device in seconds.</div>
-            <div class="about-feature-tile"><strong>📊 VAULT STATS</strong>Live header: firearm count, total estimated value, and total rounds fired across all firearms.</div>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-section-title">QUICK LINKS</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <a href="https://console.groq.com" target="_blank" rel="noopener" class="btn btn-primary" style="text-decoration:none">🔑 API KEY</a>
-            <button class="btn" onclick="closeModal('settingsModal');setTimeout(openFeedback,150)">📝 NOTES &amp; FEEDBACK</button>
-            <button class="btn" onclick="closeModal('settingsModal');setTimeout(showIntro,150)">📖 INTRO GUIDE</button>
-            <button class="btn" onclick="closeModal('settingsModal');setTimeout(()=>openArmoryOv('armory-story'),150)">🎖 OUR STORY</button>
-          </div>
+        <div class="about-feature-grid">
+          <div class="about-feature-tile"><strong>📋 INVENTORY</strong>Full spec sheets, photos and storage location per firearm.</div>
+          <div class="about-feature-tile"><strong>🤖 AI ENGINE</strong>Identify firearms from a photo, auto-fill specs, write descriptions.</div>
+          <div class="about-feature-tile"><strong>🎯 RANGE LOG</strong>Rounds per session per firearm, with a vault-wide total.</div>
+          <div class="about-feature-tile"><strong>🔧 MAINTENANCE</strong>Service dates, checklist and a timestamped log.</div>
+          <div class="about-feature-tile"><strong>📁 DOCUMENTS</strong>Attach receipts; generate Bill of Sale, 4473 checklist and insurance reports.</div>
+          <div class="about-feature-tile"><strong>📴 OFFLINE COPY</strong>Bake the app and your vault into one file that runs anywhere, no internet.</div>
         </div>
 
         <div style="font-family:var(--font);font-size:10px;color:var(--text-dim);text-align:center;padding:8px 0;line-height:1.7">
-          <span data-app-version>v3.1.0</span> · © 2026 LAZLAB Creations. All Rights Reserved.<br>
+          <span data-app-version>v3.2.0</span> · © 2026 LAZLAB Creations. All Rights Reserved.<br>
           <a href="mailto:lazlab.io@gmail.com" style="color:inherit">lazlab.io@gmail.com</a> · All data stays on your device
         </div>
-
       </div>
 
     </div>
-
-    <div class="modal-footer">
-      <button class="btn" onclick="closeModal('settingsModal')">CLOSE</button>
-      <button class="btn btn-primary" onclick="saveSettings()">SAVE SETTINGS</button>
-    </div>
-
   </div>
 </div>
 
@@ -2852,7 +2902,7 @@ select.filter-select:focus { border-color: var(--accent); }
 // ══════════════════════════════════════════
 //  APP VERSION — single source of truth (also drives the service-worker cache name)
 // ══════════════════════════════════════════
-const APP_VERSION = '3.1.0';
+const APP_VERSION = '3.2.0';
 function stampVersion() {
   document.querySelectorAll('[data-app-version]').forEach(el => { el.textContent = 'v' + APP_VERSION; });
 }
@@ -3295,7 +3345,7 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 //  SCREENS
 // ══════════════════════════════════════════
 function switchScreen(name, tabEl) {
-  if (name === 'import-export') { openSettings(); return; }
+  if (name === 'import-export') { openSettings('backup'); return; }
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t => { t.classList.remove('active'); t.removeAttribute('aria-current'); });
   document.getElementById('screen-' + name).classList.add('active');
@@ -4675,9 +4725,10 @@ function downloadTemplate() {
 //  JSON FULL BACKUP
 // ══════════════════════════════════════════
 
-function exportJSON() {
-  if (!inventory.length) { showToast('No firearms to export', 'error'); return; }
-  const backup = {
+// ── Everything that makes up a vault, in one object (used by both the .json backup and the offline copy) ──
+function buildVaultSnapshot() {
+  return {
+    app: 'armory',
     version: APP_VERSION,
     exported: new Date().toISOString(),
     count: inventory.length,
@@ -4686,20 +4737,127 @@ function exportJSON() {
       view:       localStorage.getItem('armory_view')       || 'grid',
     },
     feedback: JSON.parse(localStorage.getItem('armory_feedback') || '{"ideas":[],"issues":[],"notes":[]}'),
+    sold: soldInventory,
     inventory: inventory
   };
-  const json = JSON.stringify(backup, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  const date = new Date().toISOString().slice(0,10);
-  a.href     = url;
-  a.download = `armory-backup-${date}.json`;
+}
+
+function _downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a   = document.createElement('a');
+  a.href = url; a.download = name;
   document.body.appendChild(a); a.click();
   setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 500);
+}
+function _markBackedUp() { localStorage.setItem('armory_last_backup', new Date().toISOString()); refreshSettingsHome(); }
+
+function exportJSON() {
+  if (!inventory.length && !soldInventory.length) { showToast('Nothing to back up yet', 'error'); return; }
+  const date = new Date().toISOString().slice(0,10);
+  _downloadBlob(new Blob([JSON.stringify(buildVaultSnapshot(), null, 2)], { type: 'application/json' }), `armory-backup-${date}.json`);
+  const sold = soldInventory.length ? ` + ${soldInventory.length} sold` : '';
   const info = document.getElementById('jsonExportInfo');
-  if (info) info.textContent = `✓ ${inventory.length} firearms + settings + notes exported — ${date}`;
-  showToast(`✓ Full backup exported — ${inventory.length} firearms`, 'success');
+  if (info) info.textContent = `✓ ${inventory.length} firearms${sold} + settings + notes — ${date}`;
+  _markBackedUp();
+  showToast(`✓ Backup saved — ${inventory.length} firearms${sold}`, 'success');
+}
+
+// ══════════════════════════════════════════
+//  OFFLINE COPY ("bake")
+//  One self-contained .html: this app + the SheetJS library + demo photos + your whole vault, all inlined.
+//  Double-click it (or open it from a phone's file manager) and it runs with no internet and no install.
+//  On first open it loads the baked vault into that browser's storage; after that it behaves like the app.
+// ══════════════════════════════════════════
+const _BAKE = window.ARMORY_BAKE || null;     // set by _bakeSeed() when this page IS a baked file
+
+// Runs in the <head> of a baked file, before the app's own script, so the vault is in storage before the app reads it.
+// Written as a function so it is syntax-checked with the rest of the app and serialised into the baked file via toString().
+function _bakeSeed(force) {
+  try {
+    var el = document.getElementById('armory-bake'); if (!el) return;
+    var b = JSON.parse(el.textContent), ls = localStorage;
+    window.ARMORY_BAKE = window.ARMORY_BAKE || { baked: b.baked, version: b.version, count: (b.inventory || []).length, sold: (b.sold || []).length, pending: false };
+    if (!force) {
+      if (ls.getItem('armory_bake_id') === b.baked) return;                 // already loaded on this browser
+      var cur = []; try { cur = JSON.parse(ls.getItem('armory_inventory') || '[]'); } catch (e) {}
+      if (cur.length) { window.ARMORY_BAKE.pending = true; return; }        // browser already has a vault: ask first
+    }
+    ls.setItem('armory_inventory', JSON.stringify(b.inventory || []));
+    ls.setItem('armory_sold', JSON.stringify(b.sold || []));
+    if (b.settings && b.settings.text_model) ls.setItem('armory_text_model', b.settings.text_model);
+    if (b.settings && b.settings.view) ls.setItem('armory_view', b.settings.view);
+    if (b.feedback) ls.setItem('armory_feedback', JSON.stringify(b.feedback));
+    ls.setItem('armory-onboarded', '1');
+    ls.setItem('armory_bake_id', b.baked);
+    window.ARMORY_BAKE.pending = false;
+  } catch (e) { console.warn('ARMORY offline copy could not load its vault', e); }
+}
+
+function _promptBakeLoad() {
+  if (!_BAKE || !_BAKE.pending) return;
+  localStorage.setItem('armory_bake_id', _BAKE.baked);        // ask once; "keep" means keep
+  armoryConfirm({
+    icon: '📴', title: 'Load the baked vault?',
+    body: `This offline copy holds ${_BAKE.count} firearm${_BAKE.count === 1 ? '' : 's'}, baked ${_fmtDay(_BAKE.baked)}. This browser already has a vault. Replace it with the baked one, or cancel to keep what is here.`,
+    confirmLabel: 'REPLACE', danger: true,
+    onConfirm: () => { _bakeSeed(true); location.reload(); }
+  });
+}
+
+function _blobToDataURL(blob) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
+}
+
+async function exportBake() {
+  if (_BAKE) { showToast('This already is an offline copy — bake a fresh one from the online app', 'info'); return; }
+  if (!inventory.length && !soldInventory.length) { showToast('Nothing in the vault to bake yet', 'error'); return; }
+  const btn = document.getElementById('bakeBtn'), info = document.getElementById('bakeInfo');
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = 'BAKING…'; info.textContent = '';
+  try {
+    const get = async (u, blob) => { const r = await fetch(u); if (!r.ok) throw new Error(u + ' → ' + r.status); return blob ? r.blob() : r.text(); };
+    let [src, xlsx, icon] = await Promise.all([get('./index.html'), get('./vendor/xlsx.full.min.js'), get('./icon-192.png', true)]);
+    const CLOSE = '<' + '/script>';                      // a literal close-tag here would end this very <script> block
+    const xlsxTag = '<script src="./vendor/xlsx.full.min.js">' + CLOSE;
+    if (!src.includes(xlsxTag) || !src.includes('const APP_VERSION')) throw new Error('app file not recognised');
+
+    const snap = buildVaultSnapshot();
+    snap.baked = snap.exported; delete snap.exported;
+    let payload = JSON.stringify(snap);
+
+    // Bundled demo photos are separate files — fold them into the page so they still show offline.
+    const demo = [...new Set((src + payload).match(/demo\/[\w-]+\.jpg/g) || [])];
+    for (const p of demo) {
+      try { const url = await _blobToDataURL(await get('./' + p, true)); src = src.split(p).join(url); payload = payload.split(p).join(url); }
+      catch (e) { console.warn('bake: could not inline', p, e); }
+    }
+    const iconUrl = await _blobToDataURL(icon);
+    const noEndScript = s => s.replace(/<\/(script)/gi, '<\\/$1');
+
+    src = src.replace(/<link rel="manifest"[^>]*>\s*/, '')
+             .replace(/<link rel="apple-touch-icon"[^>]*>\s*/, '')
+             .replace(/<link rel="icon"[^>]*>\s*/g, '')
+             .replace('</head>', () => `<link rel="icon" type="image/png" href="${iconUrl}">\n</head>`)
+             .replace(/<title>[^<]*<\/title>/, () => `<title>ARMORY — Offline copy ${snap.baked.slice(0, 10)}</title>`)
+             .replace(xlsxTag, () =>
+               '<script>' + noEndScript(xlsx) + CLOSE + '\n' +
+               '<script id="armory-bake" type="application/json">' + payload.replace(/</g, '\\u003c') + CLOSE + '\n' +
+               '<script>(' + _bakeSeed.toString() + ')();' + CLOSE);
+
+    const date = snap.baked.slice(0, 10);
+    const blob = new Blob([src], { type: 'text/html' });
+    _downloadBlob(blob, `armory-offline-${date}.html`);
+    const mb = (blob.size / 1048576).toFixed(1);
+    info.textContent = `✓ ${inventory.length} firearms baked in — ${mb} MB — ${date}`;
+    _markBackedUp();
+    showToast(`✓ Offline copy saved (${mb} MB)`, 'success');
+  } catch (err) {
+    console.error('bake failed', err);
+    info.textContent = '';
+    showToast('Could not bake — open ARMORY once with a connection, then try again', 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = label;
+  }
 }
 
 let _pendingJSONData = null;
@@ -4715,7 +4873,7 @@ function handleJSONDrop(event) {
   event.preventDefault();
   document.getElementById('jsonDropZone').classList.remove('drag-over');
   const file = event.dataTransfer.files[0];
-  if (!file || !file.name.endsWith('.json')) { showToast('Please drop a .json file', 'error'); return; }
+  if (!file || !/\.(json|html?)$/i.test(file.name)) { showToast('Please drop a .json backup or .html offline copy', 'error'); return; }
   processJSONFile(file, 'pending');
 }
 
@@ -4723,20 +4881,28 @@ function processJSONFile(file, mode) {
   const reader = new FileReader();
   reader.onload = e => {
     try {
-      const parsed = JSON.parse(e.target.result);
-      const items    = Array.isArray(parsed) ? parsed : (parsed.inventory || []);
-      if (!items.length) { showToast('No firearms found in backup file', 'error'); return; }
-      _pendingJSONData = { items, settings: parsed.settings || null, feedback: parsed.feedback || null };
-      const hasSettings = parsed.settings && parsed.settings.api_key;
+      let text = e.target.result;
+      if (/^\s*</.test(text)) {                       // an offline-copy .html: pull the vault out of it (scripts in it never run)
+        const node = new DOMParser().parseFromString(text, 'text/html').getElementById('armory-bake');
+        if (!node) { showToast('That HTML file is not an ARMORY offline copy', 'error'); return; }
+        text = node.textContent;
+      }
+      const parsed = JSON.parse(text);
+      const items  = Array.isArray(parsed) ? parsed : (parsed.inventory || []);
+      const sold   = Array.isArray(parsed.sold) ? parsed.sold : null;
+      if (!items.length && !(sold && sold.length)) { showToast('No firearms found in that file', 'error'); return; }
+      _pendingJSONData = { items, sold, settings: parsed.settings || null, feedback: parsed.feedback || null };
       const hasFeedback = parsed.feedback && (
         (parsed.feedback.ideas||[]).length + (parsed.feedback.issues||[]).length + (parsed.feedback.notes||[]).length > 0
       );
-      const extras = [hasSettings ? 'API key' : '', hasFeedback ? 'notes' : ''].filter(Boolean).join(' + ');
+      const extras = [sold && sold.length ? sold.length + ' sold' : '', hasFeedback ? 'notes' : ''].filter(Boolean).join(' + ');
+      const msg = items.length + ' firearms' + (extras ? ' + ' + extras : '') + ' ready — choose Merge or Replace';
       const info = document.getElementById('jsonImportInfo');
-      if (info) info.textContent = items.length + ' firearms' + (extras ? ' + ' + extras : '') + ' ready -- choose MERGE or REPLACE ALL';
-      showToast(items.length + ' firearms ready -- choose Merge or Replace', 'info');
+      if (info) info.textContent = msg;
+      const act = document.getElementById('jsonActions'); if (act) act.style.display = '';
+      showToast(items.length + ' firearms ready — choose Merge or Replace', 'info');
     } catch(err) {
-      showToast('Invalid JSON file', 'error');
+      showToast('Could not read that file', 'error');
       console.error(err);
     }
   };
@@ -4744,12 +4910,18 @@ function processJSONFile(file, mode) {
 }
 
 function importJSONConfirm(mode) {
-  if (!_pendingJSONData) { showToast('Load a .json backup file first', 'error'); return; }
-  const { items, settings, feedback } = _pendingJSONData;
+  if (!_pendingJSONData) { showToast('Load a backup file first', 'error'); return; }
+  const { items, sold, settings, feedback } = _pendingJSONData;
+  const done = () => {
+    _pendingJSONData = null;
+    const act = document.getElementById('jsonActions'); if (act) act.style.display = 'none';
+    document.getElementById('jsonImportInfo').textContent = '';
+    refreshSettingsHome();
+  };
 
   function restoreSettingsAndFeedback() {
     if (settings) {
-      if (settings.api_key)    localStorage.setItem('armory_api_key', settings.api_key);
+      if (settings.api_key)    localStorage.setItem('armory_api_key', settings.api_key);   // very old backups only
       if (settings.text_model) localStorage.setItem('armory_text_model', settings.text_model);
       if (settings.view)       localStorage.setItem('armory_view', settings.view);
       updateApiStatus();
@@ -4763,19 +4935,19 @@ function importJSONConfirm(mode) {
     armoryConfirm({
       icon: '⚠️',
       title: 'Replace All Inventory',
-      body: `This will delete all ${inventory.length} current firearms and load ${items.length} from the backup. Settings and notes in the backup will also be restored.`,
+      body: `This will delete all ${inventory.length} current firearms and load ${items.length} from the file. Sold records, settings and notes in the file are restored too.`,
       confirmLabel: 'REPLACE',
       danger: true,
       onConfirm: () => {
         inventory = items.map(g => ({ ...g, id: g.id || uid() }));
         save();
+        if (sold) { soldInventory = sold.map(g => ({ ...g, id: g.id || uid() })); saveSold(); renderSold(); }
         restoreSettingsAndFeedback();
         renderInventory();
         updateCaliberFilter();
         updateStats();
-        _pendingJSONData = null;
-        document.getElementById('jsonImportInfo').textContent = '';
-        showToast('Replaced -- ' + inventory.length + ' firearms loaded', 'success');
+        done();
+        showToast('Replaced — ' + inventory.length + ' firearms loaded', 'success');
       }
     });
     return;
@@ -4795,13 +4967,17 @@ function importJSONConfirm(mode) {
       }
     });
     save();
+    let soldAdded = 0;
+    if (sold) {
+      sold.forEach(s => { if (!soldInventory.some(x => x.id === s.id)) { soldInventory.push(s); soldAdded++; } });
+      if (soldAdded) { saveSold(); renderSold(); }
+    }
     restoreSettingsAndFeedback();
     renderInventory();
     updateCaliberFilter();
     updateStats();
-    _pendingJSONData = null;
-    document.getElementById('jsonImportInfo').textContent = '';
-    showToast('Merged -- ' + added + ' added, ' + updated + ' updated', 'success');
+    done();
+    showToast('Merged — ' + added + ' added, ' + updated + ' updated' + (soldAdded ? ', ' + soldAdded + ' sold' : ''), 'success');
   }
 }
 
@@ -4810,6 +4986,7 @@ function importJSONConfirm(mode) {
 // ══════════════════════════════════════════
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) {
+  if (id === 'settingsModal' && document.getElementById(id).classList.contains('open')) { try { saveApiKey(); } catch (e) {} }
   document.getElementById(id).classList.remove('open');
   if (id==='cameraModal') stopCamera();
 }
@@ -4832,11 +5009,53 @@ function showToast(msg, type='info') {
 // ══════════════════════════════════════════
 //  SETTINGS
 // ══════════════════════════════════════════
-function switchSettingsTab(tab) {
-  document.querySelectorAll('.stab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.stab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('stab-' + tab).classList.add('active');
-  document.getElementById('spanel-' + tab).classList.add('active');
+const SETTINGS_PAGES = { home:'Settings', ai:'AI assistant', backup:'Backup & offline copy', sheets:'Spreadsheets', tools:'Vault tools', about:'About & help' };
+let _smPage = 'home';
+function settingsGo(page) {
+  if (!SETTINGS_PAGES[page]) page = 'home';
+  _smPage = page;
+  document.querySelectorAll('#settingsModal .sp').forEach(p => p.classList.toggle('active', p.id === 'sp-' + page));
+  document.getElementById('smTitle').textContent = SETTINGS_PAGES[page];
+  document.getElementById('smBack').hidden = (page === 'home');
+  if (page === 'home') refreshSettingsHome();
+  if (page === 'backup') refreshBackupPage();
+  const body = document.getElementById('smBody'); if (body) body.scrollTop = 0;
+}
+function settingsBack() { settingsGo('home'); }
+// Used by the hardware Back button: climb one level before closing the whole sheet.
+function settingsBackStep() { if (_smPage !== 'home') { settingsGo('home'); return true; } return false; }
+
+function _fmtDay(iso) {
+  try { return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); } catch (e) { return ''; }
+}
+function refreshSettingsHome() {
+  const ai = document.getElementById('smSubAi'), bk = document.getElementById('smSubBackup');
+  if (ai) {
+    const key = localStorage.getItem('armory_api_key') || '';
+    ai.textContent = key ? 'Key saved · ' + getTextModel().split('/').pop() : 'Add your free Groq key to turn on AI';
+    ai.classList.toggle('warn', !key);
+  }
+  if (bk) {
+    const last = localStorage.getItem('armory_last_backup');
+    const old = last && (Date.now() - new Date(last).getTime() > 30 * 864e5);
+    bk.textContent = (typeof _BAKE !== 'undefined' && _BAKE)
+      ? 'Offline copy · baked ' + _fmtDay(_BAKE.baked)
+      : last ? (old ? 'Last backup ' + _fmtDay(last) + ' — due for a new one' : 'Last backup ' + _fmtDay(last))
+             : 'Never backed up — save a copy';
+    bk.classList.toggle('warn', !last || !!old);
+  }
+  updateStorageInfo();
+}
+function refreshBackupPage() {
+  const baked = (typeof _BAKE !== 'undefined') && _BAKE;
+  const hint = document.getElementById('bakeHint'), btn = document.getElementById('bakeBtn'), info = document.getElementById('bakeInfo');
+  if (!hint || !btn) return;
+  if (baked) {
+    hint.innerHTML = `You're running an <strong>offline copy</strong> baked ${_fmtDay(_BAKE.baked)} (${_BAKE.count} firearms). Changes you make stay in this browser. To bake a fresh copy, open the online/installed app — or save a .json backup below.`;
+    btn.style.display = 'none'; info.textContent = '';
+  } else {
+    btn.style.display = '';
+  }
 }
 
 function populateDocsSelects() {
@@ -4857,12 +5076,14 @@ function updateStorageInfo() {
     let chars = 0;
     for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); chars += k.length + (localStorage.getItem(k) || '').length; }
     const mb = chars * 2 / 1048576, pct = Math.min(100, Math.round(mb / 5 * 100));
-    el.innerHTML = `💾 Device storage used by ARMORY data: <strong style="color:var(--text-primary)">${mb.toFixed(1)} MB</strong> of roughly 5 MB (${pct}%).` +
-      (pct >= 80 ? ' <span style="color:var(--red)">Getting full — export a backup and remove large photos.</span>' : '');
+    el.innerHTML = `<div class="sm-meter-bar${pct >= 80 ? ' hot' : ''}"><i style="width:${Math.max(2, pct)}%"></i></div>` +
+      `Device storage: <strong style="color:var(--text-primary)">${mb.toFixed(1)} MB</strong> of roughly 5 MB (${pct}%).` +
+      (pct >= 80 ? ' <span style="color:var(--red)">Getting full — save a backup and trim large photos.</span>' : '');
   } catch (e) { el.textContent = ''; }
 }
 
-function openSettings() {
+function openSettings(page) {
+  if (typeof page !== 'string') page = 'home';       // inline onclick="openSettings()" passes nothing
   // Migrate: if only old Gemini key exists, clear it and show warning
   const geminiKey = localStorage.getItem('armory_gemini_key');
   const currentKey = localStorage.getItem('armory_api_key') || '';
@@ -4876,8 +5097,7 @@ function openSettings() {
   document.getElementById('apiKeyInput').style.borderColor = '';
   document.getElementById('apiKeyInput').type = 'password';
   document.getElementById('toggleKeyBtn').textContent = 'SHOW';
-  // Populate model dropdown — prefer whatever we last pulled live from Groq, then fall
-  // back to the hardcoded defaults baked into the <select>.
+  // Model dropdown — prefer whatever we last pulled live from Groq, then the hardcoded defaults in the <select>.
   const modelSel = document.getElementById('textModelSelect');
   const cachedIds = getCachedModelIds();
   const statusEl = document.getElementById('modelListStatus');
@@ -4887,33 +5107,47 @@ function openSettings() {
       ? `Showing ${cachedIds.length} model(s) last pulled from Groq. Tap 🔄 to refresh.`
       : `Enter your key above, then tap 🔄 to pull whatever models Groq currently serves on it.`;
   }
-  switchSettingsTab('ai');
-  updateStorageInfo();
+  updateApiStatus();
+  settingsGo(page);
   openModal('settingsModal');
-  // If we already have a key on file, quietly refresh in the background so the list
-  // stays current without the user needing to remember to press the button.
+  // Quietly refresh the model list in the background when a key is on file.
   if (currentKey) refreshModelList(false);
 }
 
-function saveSettings() {
-  const key = document.getElementById('apiKeyInput').value.trim();
+// Settings save themselves — no Save button to forget.
+function saveApiKey() {
+  const inp = document.getElementById('apiKeyInput');
+  const key = inp.value.trim();
   if (key && !key.startsWith('gsk_')) {
     showToast('⚠ That doesn\'t look like a Groq key — it should start with "gsk_"', 'error');
-    document.getElementById('apiKeyInput').style.borderColor = 'var(--red)';
-    return;
+    inp.style.borderColor = 'var(--red)';
+    return false;
   }
-  document.getElementById('apiKeyInput').style.borderColor = '';
-  if (key) localStorage.setItem('armory_api_key', key);
-  else localStorage.removeItem('armory_api_key');
-  // Also clear any old Gemini key that may still be lurking
+  inp.style.borderColor = '';
+  if (key === (localStorage.getItem('armory_api_key') || '')) return true;   // nothing changed
+  if (key) localStorage.setItem('armory_api_key', key); else localStorage.removeItem('armory_api_key');
   localStorage.removeItem('armory_gemini_key');
-  // Save text model preference
-  const modelSel = document.getElementById('textModelSelect');
-  if (modelSel) localStorage.setItem('armory_text_model', modelSel.value);
-  closeModal('settingsModal');
+  updateApiStatus();
+  refreshSettingsHome();
   showToast(key ? '✓ Groq API key saved' : 'API key cleared', key ? 'success' : 'info');
-  if (key) refreshModelList(false); // keep the model cache current for next time
+  if (key) refreshModelList(false);
+  return true;
 }
+function saveModelChoice() {
+  const sel = document.getElementById('textModelSelect');
+  if (!sel) return;
+  localStorage.setItem('armory_text_model', sel.value);
+  refreshSettingsHome();
+  showToast('✓ Model set to ' + sel.value.split('/').pop(), 'success');
+}
+function removeApiKey() {
+  if (!localStorage.getItem('armory_api_key')) { showToast('No key stored', 'info'); return; }
+  armoryConfirm({ icon: '🔑', title: 'Remove API Key', body: 'Your stored Groq API key will be deleted. AI features will stop working until a new key is added.',
+    confirmLabel: 'REMOVE', danger: true,
+    onConfirm: () => { localStorage.removeItem('armory_api_key'); document.getElementById('apiKeyInput').value = ''; updateApiStatus(); refreshSettingsHome(); showToast('API key removed', 'info'); } });
+}
+// Kept for anything still calling it: saves both fields.
+function saveSettings() { if (saveApiKey()) saveModelChoice(); }
 
 function toggleKeyVisibility() {
   const inp = document.getElementById('apiKeyInput');
@@ -4926,6 +5160,7 @@ function toggleKeyVisibility() {
 //  INIT
 // ══════════════════════════════════════════
 function init() {
+  if (typeof _BAKE !== 'undefined' && _BAKE && _BAKE.pending) setTimeout(_promptBakeLoad, 700);
   // Restore saved view
   setView(currentView);
   renderInventory();
@@ -6537,7 +6772,7 @@ function exportInsurance(id) {
         </div></div>` : '';
 
   const html = `<!DOCTYPE html>
-<!-- ARMORY v3.1.0 · © 2026 LAZLAB Creations. All Rights Reserved. -->
+<!-- ARMORY v3.2.0 · © 2026 LAZLAB Creations. All Rights Reserved. -->
 <html><head><meta charset="UTF-8">
 <title>Insurance — ${g.make} ${g.model}</title>
 <style>
@@ -6611,7 +6846,7 @@ function exportAllInsurance() {
     </div>`).join('<div class="divider"></div>');
 
   const html = `<!DOCTYPE html>
-<!-- ARMORY v3.1.0 · © 2026 LAZLAB Creations. All Rights Reserved. -->
+<!-- ARMORY v3.2.0 · © 2026 LAZLAB Creations. All Rights Reserved. -->
 <html><head><meta charset="UTF-8">
 <title>ARMORY — Full Vault Insurance Report</title>
 <style>
@@ -6743,6 +6978,7 @@ const BackGuard = (function () {
                         confirmLabel: 'DISCARD', danger: true, onConfirm: () => closeModal('editModal') });
         return true;
       }
+      if (m.id === 'settingsModal' && settingsBackStep()) return true;
       closeModal(m.id);
       return true;
     }
